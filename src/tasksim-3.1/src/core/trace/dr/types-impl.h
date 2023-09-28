@@ -52,8 +52,12 @@ inline std::istream &operator>>(std::istream &is, mpi_info_t &mpi_info)
     char sep;
     unsigned val;
     is >> mpi_info.index >> sep;
+		//std::cerr << "index='" << mpi_info.index << "'" << std::endl;
+		//std::cerr << "set='" << sep << "'" << std::endl;
     assert(sep == ':');
     is >> mpi_info.wd_id >> sep;
+		//std::cerr << "wd='" << mpi_info.wd_id << "'" << std::endl;
+		//std::cerr << "set='" << sep << "'" << std::endl;
     assert(sep == ':');
     is >> val >> sep;
     assert(sep == ':');

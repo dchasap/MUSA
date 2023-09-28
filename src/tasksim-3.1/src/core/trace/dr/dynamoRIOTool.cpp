@@ -361,7 +361,7 @@ dr_emit_flags_t event_basicblock_analysis(void *drcontext, void *tag, instrlist_
 dr_emit_flags_t dynamoRIOTool::event_basicblock_analysis(void *drcontext, void *tag, instrlist_t *bb,
                   bool for_trace, bool translating, OUT void **user_data)
 {
-    if (translating or tracing_finished_) {
+    if (translating) {
         return DR_EMIT_DEFAULT;
     }
     // We get a lock on the mutex.
@@ -375,10 +375,10 @@ dr_emit_flags_t dynamoRIOTool::event_basicblock_analysis(void *drcontext, void *
 
     bbl_t bbl;
     bbl.id_ = bbl_info_.size();
-
     // Decoder is typedef to IntelDecoder or BasicDecoder.
     sim::trace::phase_data_t bbl_data = Decoder::translate(drcontext, bb, bbl);
     ts_trace_->add_bbl(bbl);
+    Log::info() << "Number of instructions " << bbl.macroops_.size() << " unidentified " << bbl_data.n_unid << " loads " << bbl_data.n_lds<< " stores " <<  bbl_data.n_sts;
 
     // We set the address and the number of loads/stores.
     uint64_t id = reinterpret_cast<uint64_t>(tag);
@@ -403,10 +403,6 @@ dr_emit_flags_t dynamoRIOTool::event_bb_insert(void *drcontext, void *tag, instr
                 instr_t *instr, bool for_trace, bool translating,
                 void *user_data)
 {
-    if (tracing_finished_) {
-        return DR_EMIT_DEFAULT;
-    }
-
     dr_mutex_lock(dr_mutex_);
 #ifdef ARM_64
     bool exclusive_mem = false;
@@ -1305,7 +1301,6 @@ void dynamoRIOTool::mpi_exit(void *context, const std::string &function_name, vo
 }
 
 void dynamoRIOTool::tsmpi_init(const std::string &trace_name) {
-    std::cout << "[DRTool] MPI Init." << std::endl;
     // Get experiment path
     std::string exp_path = trace_name.substr(0, trace_name.find_first_of('/'));
     std::string suffix = trace_name.substr(trace_name.size() - 9, 6);
@@ -1340,15 +1335,15 @@ void dynamoRIOTool::tsmpi_new_phase(unsigned mpi_id, const std::string &function
         if (tracing_finished_ && mpi_info_.is_mem) {
             std::cout << "[DRTool] Started instrumenting code at entry " << mpi_info_ << " WD counter : " << wd_counter_ << std::endl;
             tracing_finished_ = false;
-            dr_mutex_unlock(tool_.dr_mutex_);
-            dr_flush_region(0,-1);
-            dr_mutex_lock(tool_.dr_mutex_);
+            // dr_mutex_unlock(tool_.dr_mutex_);
+            // dr_flush_region(0,-1);
+            // dr_mutex_lock(tool_.dr_mutex_);
         } else if (tracing_finished_ == false and mpi_info_.is_nanos and mpi_info_.is_mem == false) {
             std::cout << "[DRTool] Stopped instrumenting code at entry " << mpi_info_ << " WD counter : " << wd_counter_ << std::endl;
             tracing_finished_ = true;
-            dr_mutex_unlock(tool_.dr_mutex_);
-            dr_flush_region(0,-1);
-            dr_mutex_lock(tool_.dr_mutex_);
+            // dr_mutex_unlock(tool_.dr_mutex_);
+            // dr_flush_region(0,-1);
+            // dr_mutex_lock(tool_.dr_mutex_);
         } else if (mpi_info_.is_mem) {
             std::cout << "[DRTool] Tracing phase " << mpi_info_ << " WD counter : " << wd_counter_ << std::endl;
         } else {

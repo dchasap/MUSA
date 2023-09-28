@@ -39,7 +39,8 @@ inline
 phase_data_t::phase_data_t() :
         n_lds(0),
         n_sts(0),
-        n_instrs(0)
+        n_instrs(0),
+        n_unid(0)
 {}
 
 inline

@@ -4,7 +4,8 @@ SUBDIRS = tasksim
 endif
 
 if !ONLY_TASKSIM
-bin_PROGRAMS = sttmramsim/sttmramsim fastmemsim/fastmemsim helloworldsim memsim simpleburstsim simplememsim
+bin_PROGRAMS = sttmramsim/sttmramsim fastmemsim/fastmemsim helloworldsim memsim simplememsim
+#bin_PROGRAMS = sttmramsim/sttmramsim fastmemsim/fastmemsim helloworldsim memsim simpleburstsim simplememsim
 endif
 
 frontendsim_frontendsim_SOURCES = frontendsim/frontendsim.cpp \

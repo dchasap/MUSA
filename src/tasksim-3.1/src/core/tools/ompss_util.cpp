@@ -84,7 +84,12 @@ bool file_exists(const std::string &file_name)
 void alloc_and_copy(char * argv[], unsigned i, const char *src)
 {
     argv[i] = reinterpret_cast<char*>(malloc(strlen(src) + 1));
-    strncpy(argv[i], src, strlen(argv[i]));
+		//std::cout << "[OMPSS]: allocating " << strlen(src) + 1 << " @" << i << std::endl;
+		//std::cout << "[OMPSS]: copying " << src << " @" << i << std::endl;
+    //strncpy(argv[i], src, strlen(argv[i]));
+    memcpy(argv[i], src, strlen(src));
+		//std::cout << "[OMPSS]: verifying size " << strlen(argv[i]) << " @" << i << std::endl;
+		//std::cout << "[OMPSS]: verifying content " << argv[0] << " @" << i << std::endl;
 }
 
 }  // namespace tools

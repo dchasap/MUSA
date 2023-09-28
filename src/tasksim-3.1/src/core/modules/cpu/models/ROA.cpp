@@ -200,7 +200,7 @@ ROA::insert_partial_item()
     unsigned inserted = rob_.free_entries() < next_item_.ins_ ?
             rob_.free_entries() : next_item_.ins_ - 1;
     if (inserted > 0) {
-        rob_.insert(sim::trace::mitem_t(0x0, 0, sim::trace::mitem_t::NOMEM, 0, 0, inserted));
+        rob_.insert(sim::trace::mitem_t(0x0, 0x0, 0, sim::trace::mitem_t::NOMEM, 0, 0, inserted));
         next_item_.ins_ -= inserted;
     }
     Log::debug2() << sim_.get_clock() << ":ROA[" << id_ << "]: insert partial item " << std::hex << next_item_.addr_

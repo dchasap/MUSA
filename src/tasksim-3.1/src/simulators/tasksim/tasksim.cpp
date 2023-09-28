@@ -63,6 +63,7 @@ sim::engine::Config parse_options(int, char*[], Options&);
 
 int main(int argc, char *argv[])
 {
+
     sim::stats::Time_Stats.phaseIn(sim::engine::REGION_SIMULATOR_SETUP);
     Options opt;
     sim::engine::Config conf = parse_options(argc, argv, opt);
@@ -285,6 +286,13 @@ void version(const std::string& cmd)
 #else
     std::cout << "Without Paraver trace generation." << std::endl;
 #endif
+
+#if ENABLE_MITOS
+    std::cout << "With Mitos trace generation." << std::endl;
+#else
+    std::cout << "Without Mitos trace generation." << std::endl;
+#endif
+
 
 #ifdef SIMLOG_LEVEL
     std::cout << "Compiled with System logging infrastructure at level " << SIMLOG_LEVEL << std::endl;

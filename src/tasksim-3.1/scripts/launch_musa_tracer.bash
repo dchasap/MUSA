@@ -124,8 +124,7 @@ if [ $PARALLEL_INSTRUMENTATION -eq 1 ]; then
   export LD_PRELOAD=${EXTRAE_HOME}/lib/${EXTRAE_LIB}
   ### EXECUTION. BURST MODE (mandatory, parallel)
   logname="log_step.1_burst_parallel"
-#  { LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NANOX_PERFORMANCE_LIB mpirun -np ${PR} --report-bindings --output-filename ${LOGS}/${logname} ompss_mpi_perf ${APP} ${ARGS} ; } \
-  { LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NANOX_PERFORMANCE_LIB mpirun -np ${PR} -of ${LOGS}/${logname} ompss_mpi_perf ${APP} ${ARGS} ; } \
+  { LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NANOX_PERFORMANCE_LIB mpirun -np ${PR} --report-bindings --output-filename ${LOGS}/${logname} ompss_mpi_perf ${APP} ${ARGS} ; } \
               1>${LOGS}/${logname}.out 2>${LOGS}/${logname}.err
   export LD_PRELOAD=""
   export EXTRAE_ON=0
@@ -149,8 +148,8 @@ else
 
   # step 1.1 -- EXECUTION. BURST MODE only
   logname="log_step.1.1_burst"
-# { LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NANOX_INSTRUMENTATION_LIB mpirun -np ${PR} --bind-to core  --report-bindings --output-filename ${LOGS}/${logname} musa_ompss.bash; } \
-  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NANOX_INSTRUMENTATION_LIB mpirun -np ${PR} -ofout-proc ${LOGS}/${logname}.out -oferr-proc ${LOGS}/${logname}.err musa_ompss.bash
+  { mpirun -np ${PR} --bind-to core  --report-bindings --output-filename ${LOGS}/${logname} musa_ompss.bash; } \
+              1>${LOGS}/${logname}.out 2>${LOGS}/${logname}.err
   if [ $? -ne 0 ]; then
       echo "STEP 1.1 TaskSim Nanos++ trace failed."
       exit
@@ -181,10 +180,9 @@ else
 ### step 1.2 -- EXECUTION. EXTRAE MODE only
   mkdir set-0
   logname="log_step.1.2_extrae"
-#  echo " Executing mpirun -np ${PR} --bind-to core --report-bindings --output-filename ${LOGS}/${logname} extrae_trace_command.bash"
-#  { LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NANOX_PERFORMANCE_LIB NX_ARGS="--smp-workers=1" mpirun -np ${PR} --report-bindings --output-filename ${LOGS}/${logname} extrae_trace_command.bash ; } \
-  echo " Executing mpirun -np ${PR} -of ${LOGS}/${logname} extrae_trace_command.bash"
-  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NANOX_PERFORMANCE_LIB NX_ARGS="--smp-workers=1" mpirun -np ${PR} -ofout-proc ${LOGS}/${logname}.out -oferr-proc ${LOGS}/${logname}.err extrae_trace_command.bash
+  echo " Executing mpirun -np ${PR} --bind-to core --report-bindings --output-filename ${LOGS}/${logname} extrae_trace_command.bash"
+  { LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NANOX_PERFORMANCE_LIB NX_ARGS="--smp-workers=1" mpirun -np ${PR} --report-bindings --output-filename ${LOGS}/${logname} extrae_trace_command.bash ; } \
+          1> ${LOGS}/${logname}.out 2> ${LOGS}/${logname}.err
   if [ $? -ne 0 ]; then
       echo "STEP 1.2 Extrae Nanos++ trace failed."
       exit
@@ -208,10 +206,9 @@ if [ ${MEMORY_MODE} -eq 1 ]; then
       EXTRA_FLAGS="-n"
   fi
   logname="log_step.2_memory_tracing"
-#  echo "Executing mpirun -np ${PR} --bind-to core --report-bindings --output-filename ${LOGS}/${logname} dr_musa_command.bash"
-#  { mpirun -np ${PR} --bind-to core --report-bindings --output-filename ${LOGS}/${logname} dr_musa_command.bash ; } \
-  echo "Executing mpirun -np ${PR} -of ${LOGS}/${logname} dr_musa_command.bash"
-  mpirun -np ${PR} -ofout-proc ${LOGS}/${logname}.out -oferr-proc ${LOGS}/${logname}.err dr_musa_command.bash
+  echo "Executing mpirun -np ${PR} --bind-to core --report-bindings --output-filename ${LOGS}/${logname} dr_musa_command.bash"
+  { mpirun -np ${PR} --bind-to core --report-bindings --output-filename ${LOGS}/${logname} dr_musa_command.bash ; } \
+      1>${LOGS}/${logname}.out 2>${LOGS}/${logname}.err
   if [ $? -ne 0 ]; then
       echo "STEP 2 TaskSim Memory trace generation failed."
       exit
@@ -257,8 +254,8 @@ else
   echo -e "[MUSA] MUSA_EXP_NAME= "${MUSA_EXP_NAME}
   echo -e "[MUSA] ompss_mpi_merge_mw "${APPNAME}
   logname="log_step.3.1_mergePar"
-#  { mpirun --report-bindings --output-filename ${LOGS}/${logname} ompss_mpi_merge_mw ${APPNAME} ; } \
-  mpirun -ofout-proc ${LOGS}/${logname}.out -oferr-proc ${LOGS}/${logname}.err ompss_mpi_merge_mw ${APPNAME}
+  { mpirun --report-bindings --output-filename ${LOGS}/${logname} ompss_mpi_merge_mw ${APPNAME} ; } \
+              1> ${LOGS}/${logname}.out  2>${LOGS}/${logname}.err
 fi
 
 mv ${MUSA_EXP_NAME}/${APP}_proc_* ${FINAL_TRACE}/

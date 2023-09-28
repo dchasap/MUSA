@@ -1,1 +1,1 @@
-/usr/local/software/skylake/Stages/2022/software/libtool/2.4.6-GCCcore-11.2.0/share/aclocal/ltversion.m4
+/usr/share/aclocal/ltversion.m4

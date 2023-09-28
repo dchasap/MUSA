@@ -108,6 +108,7 @@ public:
     /** Normal call that adds one event: */
     void add_event(const InstrumentationItem &event);
     void add_function_name(const char* name);
+    void add_precise_memory_event(const InstrumentationItem &event);
     sim::engine::cycles_t get_hardware_sampling_interval();
     // Function to close fast the intermediate buffer in case of unexpected simulator finish.
     void dump_buffer();

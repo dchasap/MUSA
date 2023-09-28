@@ -72,6 +72,7 @@ public:
     void add_event(const InstrumentationItem&);
     void add_event(const InstrumentationItem&, sim::engine::Module&);
     void add_function_name(const char* name);
+    void add_precise_memory_event(const InstrumentationItem&);
     sim::engine::cycles_t get_hardware_sampling_interval();
     void dump_buffer();
 };
@@ -91,6 +92,7 @@ public:
     void add_event(const InstrumentationItem&) { }
     void add_event(const InstrumentationItem&, sim::engine::Module&) { }
     void add_function_name(const char* name) { }
+    void add_precise_memory_event(const InstrumentationItem&) { }
     sim::engine::cycles_t get_hardware_sampling_interval() { return sim::engine::NEVER; }
     void dump_buffer() {}
 };
@@ -107,6 +109,15 @@ namespace sim {
 namespace utils {
 namespace instrumentation {
 typedef Paraver SelectedInstrumentation;
+}  // namespace instrumentation
+}  // namespace utils
+}  // namespace sim
+#elif defined ENABLE_MITOS
+#include "Mitos.h"
+namespace sim {
+namespace utils {
+namespace instrumentation {
+typedef Mitos SelectedInstrumentation;
 }  // namespace instrumentation
 }  // namespace utils
 }  // namespace sim

@@ -100,11 +100,12 @@ void FastMem<T,R>::fetch_mem_request()
 
     if (mem_request.op_ == trace::fastmem::mem_t::op_t::READ)
     {
-        pending_request_ = new typename T::Request(T::Request::op_t::READ, mem_request.addr_, mem_request.size_);
+				//FIXME:
+        pending_request_ = new typename T::Request(T::Request::op_t::READ, mem_request.addr_, mem_request.size_, 68, 68);
     }
     else
     {
-        pending_request_ = new typename T::Request(T::Request::op_t::WRITE, mem_request.addr_, mem_request.size_);
+        pending_request_ = new typename T::Request(T::Request::op_t::WRITE, mem_request.addr_, mem_request.size_, 68, 68);
     }
 
     send_cycle_ = this->get_simulator().get_clock() + mem_request.delay_ + 1;

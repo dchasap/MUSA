@@ -85,7 +85,7 @@ public:
     bool inspect(const typename Message::Request &);
     bool inspect(const typename Message::Ack &);
 
-    void memcpy(const engine::addr_t &, const engine::addr_t &, const std::size_t &);
+    void memcpy(const engine::addr_t &, const engine::addr_t &, const std::size_t &, uint64_t ip);
 
     typename Interconnect<Message>::Output out_;
 };

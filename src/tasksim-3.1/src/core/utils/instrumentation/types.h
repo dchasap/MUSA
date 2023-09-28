@@ -32,6 +32,7 @@
 #include <memory>
 #include "core/engine/types.h"
 #include "ParaverDefs.h"
+#include "MitosDefs.h"
 
 namespace sim {
 namespace utils {
@@ -59,6 +60,15 @@ struct Event {
     uint64_t value_;
 };
 
+struct PreciseMemoryEvent {
+		uint32_t op_;
+		uint64_t ip_;
+		uint64_t addr_;
+		uint64_t latency_;
+		uint64_t level_;
+		uint64_t access_type_;	
+};
+
 enum RecordType { STATE_RECORD = 1, EVENT_RECORD = 2, COMM_RECORD = 3};
 
 struct InstrumentationItem {
@@ -70,9 +80,11 @@ struct InstrumentationItem {
         State state_;
         Comm comm_;
         Event event_;
+				PreciseMemoryEvent pmem_event_;
         Item(State s) : state_(s) { }
         Item(Comm c) : comm_(c) { }
         Item(Event e) : event_(e) { }
+				Item(PreciseMemoryEvent m) : pmem_event_(m) { }
         Item() { }
     } u;
 

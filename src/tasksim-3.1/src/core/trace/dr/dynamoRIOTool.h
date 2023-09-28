@@ -233,7 +233,7 @@ public:
             roi_detected_(false),
             roi_(false),
             roi_used_(false),
-            tracing_finished_(true),
+            tracing_finished_(false),
             total_detected_ld_(0),
             total_detected_st_(0),
             current_wd_(0),

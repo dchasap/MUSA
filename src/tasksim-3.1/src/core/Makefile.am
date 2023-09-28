@@ -50,7 +50,6 @@ tasksim_presim_sorter_SOURCES = utils/tsmpi/tasksim_presim_sorter.cpp
 lib_LTLIBRARIES += utils/tsmpi/libtsmpi.la
 utils_tsmpi_libtsmpi_la_SOURCES = utils/tsmpi/libtsmpi.c
 utils_tsmpi_libtsmpi_la_CFLAGS=-D_GNU_SOURCE -D_TS_PATH=\"$(prefix)\" -fPIC -I$(mpi_install_path)/include
-#utils_tsmpi_libtsmpi_la_LDFLAGS=-lz -fPIC -L$(mpi_lib_path) -lmpi -lmpi_cxx -ldl
 utils_tsmpi_libtsmpi_la_LDFLAGS=-lz -fPIC -L$(mpi_lib_path) -lmpi -ldl
 
 endif  # ENABLE_MPI
@@ -104,8 +103,7 @@ ompss_mpi_perf_CPPFLAGS = -D_TS_PATH=\"$(prefix)\" $(AM_CPPFLAGS)
 ompss_mpi_perf_LDADD = libnextsim-utils.la
 ompss_mpi_mem_SOURCES = tools/ompss_mpi_mem.cpp
 ompss_mpi_mem_CPPFLAGS = -D_TS_PATH=\"$(prefix)\" -I$(mpi_install_path)/include $(AM_CPPFLAGS)
-#ompss_mpi_mem_LDFLAGS = -L$(mpi_lib_path) -lmpi -lmpi_cxx $(AM_LDFLAGS)
-ompss_mpi_mem_LDFLAGS = -L$(mpi_lib_path) -lmpi $(AM_LDFLAGS)
+ompss_mpi_mem_LDFLAGS = -L$(mpi_lib_path) -lmpi -lmpi_cxx $(AM_LDFLAGS)
 ompss_mpi_mem_LDADD = libnextsim-utils.la
 
 ompss_mpi_dr_mem_SOURCES = tools/ompss_mpi_dr_mem.cpp

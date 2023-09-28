@@ -53,6 +53,7 @@ mitem_queue_t::push_bbl(const bbl_t& bbl)
         if (bbl.ins_[i].isLoad()) {
             for (; nloads > 0; --nloads) {
                 mitem_t mitem;
+								mitem.pc_ = bbl.ins_[i].pc_;
                 mitem.op_ = mitem_t::LOAD;
                 mitem.size_ = bbl.ins_[i].ld_size_;
                 // assert(static_cast<int>(mitem.size_) != 0);
@@ -66,6 +67,7 @@ mitem_queue_t::push_bbl(const bbl_t& bbl)
         } else if (bbl.ins_[i].isStore()) {
             for (; nstores > 0; --nstores) {
                 mitem_t mitem;
+								mitem.pc_ = bbl.ins_[i].pc_;
                 mitem.op_ = mitem_t::STORE;
                 mitem.size_ = bbl.ins_[i].st_size_;
                 // assert(static_cast<int>(mitem.size_) != 0);

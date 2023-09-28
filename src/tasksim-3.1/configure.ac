@@ -19,8 +19,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([subdir-objects])
 AM_SILENT_RULES([yes])
-#LT_PREREQ([2.4.6])
-LT_INIT
+AM_PROG_LIBTOOL
 AM_PROG_AS
 
 AM_PROG_CC_C_O
@@ -63,23 +62,13 @@ AC_ARG_WITH([simlog-level],
         [AC_DEFINE_UNQUOTED(SIMLOG_LEVEL, [$withval]) simlog_level=$withval],
         [AC_DEFINE(SIMLOG_LEVEL, 1) simlog_level=1])
 
-#if test x"$debugit" = x"yes"; then
-#  global_cxxflags="$CXXFLAGS -g -Wall -Wno-uninitialized -O0 -lz"
-#else
-#  if test x"$asserts" = x"yes"; then
-#    global_cxxflags="$CXXFLAGS -Wall -Wno-uninitialized -O3 -lz"
-#  else
-#    global_cxxflags="$CXXFLAGS -Wall -Wno-uninitialized -O3 -DNDEBUG -lz"
-#  fi
-#fi
-
 if test x"$debugit" = x"yes"; then
-  global_cxxflags="$CXXFLAGS -g -Wno-uninitialized -O0 -lz"
+  global_cxxflags="$CXXFLAGS -g -Wall -Wno-uninitialized -O0 -lz"
 else
   if test x"$asserts" = x"yes"; then
-    global_cxxflags="$CXXFLAGS -Wno-uninitialized -O3 -lz"
+    global_cxxflags="$CXXFLAGS -Wall -Wno-uninitialized -O3 -lz"
   else
-    global_cxxflags="$CXXFLAGS -Wno-uninitialized -O3 -DNDEBUG -lz"
+    global_cxxflags="$CXXFLAGS -Wall -Wno-uninitialized -O3 -DNDEBUG -lz"
   fi
 fi
 
@@ -174,8 +163,7 @@ if test x"$enable_ramulator" = x"yes"; then
         ramulator_lib_path="$withval",
         AC_MSG_ERROR("ramulator-lib-path not specified",-1))
 else
-  #global_cxxflags="$global_cxxflags -Werror"
-  global_cxxflags="$global_cxxflags"
+  global_cxxflags="$global_cxxflags -Werror"
 fi
 AM_CONDITIONAL([ENABLE_RAMULATOR], [test "x$enable_ramulator" = "xyes"])
 AC_SUBST(ramulator_src_path, ["$ramulator_src_path"])
@@ -210,6 +198,19 @@ AC_MSG_RESULT([$enable_paraver])
 AM_CONDITIONAL([ENABLE_PARAVER], [test "x$enable_paraver" = "xyes"])
 if test x"$enable_paraver" = x"yes"; then
 	AC_DEFINE(ENABLE_PARAVER)
+fi
+
+dnl Check whether to create Mitos trace
+AC_MSG_CHECKING([whether Mitos trace generation is enabled])
+AC_ARG_ENABLE([mitos],
+    [AS_HELP_STRING([--enable-mitos],
+        [Enable Mitos trace generation (default = no)])],
+    [enable_mitos="$enableval"],
+    [enable_mitos=no])
+AC_MSG_RESULT([$enable_mitos])
+AM_CONDITIONAL([ENABLE_MITOS], [test "x$enable_mitos" = "xyes"])
+if test x"$enable_mitos" = x"yes"; then
+	AC_DEFINE(ENABLE_MITOS)
 fi
 
 dnl Check whether to generate time usage statistics

@@ -259,6 +259,7 @@ int write_all(int *local_array, int local_size, char *mpi_relation_file_name) {
 // interposition functions
 /************************************************************************/
 int mpi_init_(MPI_Fint *ierror) {
+    printf("[DEBUG] Using Fortran's MPI init.\n");
     MPI_Init(0, NULL);
 }
 
@@ -286,8 +287,13 @@ int MPI_Init(int *argc, char ***argv) {
     return result;
 }
 
+int mpi_init_thread_(MPI_Fint *required, MPI_Fint *provided, MPI_Fint *ierror) {
+    printf("[DEBUG] Using Fortran's MPI init thread.\n");
+    MPI_Init_thread(0, NULL, *required, provided);
+}
 
 int MPI_Init_thread(int *argc, char ***argv, int required, int *provided) {
+    printf("[TSMPI] MPI Init_thread.\n");
     static int (*real_MPI_Init_thread)(int *, char ***, int, int *) = NULL;
     int result;
 

@@ -44,6 +44,7 @@ namespace trace {
 struct mitem_t {
     /** item operation. NOMEM represents just a set of non-memory instructions */
     typedef enum { INVALID = 0, LOAD = 1, STORE = 2, NOMEM = 3, NOPS = 4 } op_t;
+		addr_t pc_;							/**< Address of the instruction initiating the memory access */
     addr_t addr_;           /**< Address of the memory access */
     addr_t data_;           /**< Read/written data (debug/new features) */
     unsigned char op_:2;    /**< item operation, takes values of type mitem_t::op_t */
@@ -53,7 +54,7 @@ struct mitem_t {
     uint8_t ins_;           /**< number of instruction to the previous item */
 
     mitem_t();
-    mitem_t(addr_t addr, addr_t data, uint8_t op, uint8_t flags, uint16_t size, uint8_t nins);
+    mitem_t(addr_t ip, addr_t addr, addr_t data, uint8_t op, uint8_t flags, uint16_t size, uint8_t nins);
     void write(std::ostream &) const;
     void read(std::istream &);
 };

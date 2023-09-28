@@ -414,6 +414,9 @@ void Paraver::add_function_name(const char* name)
 }
 
 inline
+void Paraver::add_precise_memory_event(const InstrumentationItem &trace_item) { }
+
+inline
 sim::engine::cycles_t Paraver::get_hardware_sampling_interval()
 {
     return hardware_sampling_interval_;

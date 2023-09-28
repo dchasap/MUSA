@@ -537,7 +537,7 @@ void MMU::load_access_profile()
 }
 
 inline
-void MMU::notify_clear_complete(unsigned cpu_id, engine::addr_t &physical_page)
+void MMU::notify_clear_complete(unsigned cpu_id, engine::addr_t &physical_page, uint64_t ip)
 {
     engine::addr_t page_color = (physical_page & color_mask_) >> color_offset_;
 
@@ -553,7 +553,7 @@ void MMU::notify_clear_complete(unsigned cpu_id, engine::addr_t &physical_page)
         j->second.status_ = page_table_entry_t::MIGRATING;
         j->second.timestamp_ = sim_->get_clock();
         forward_migration_count_++;
-        dma_->memcpy(physical_page, free_physical_page, page_size_);
+        dma_->memcpy(physical_page, free_physical_page, page_size_, ip);
     } else {
         if (empty_pages_[page_color].size() > 0) {
             engine::addr_t free_physical_page = empty_pages_[page_color].front();
@@ -564,7 +564,7 @@ void MMU::notify_clear_complete(unsigned cpu_id, engine::addr_t &physical_page)
             j->second.status_ = page_table_entry_t::MIGRATING;
             j->second.timestamp_ = sim_->get_clock();
             backward_migration_count_++;
-            dma_->memcpy(physical_page, free_physical_page, page_size_);
+            dma_->memcpy(physical_page, free_physical_page, page_size_, ip);
         } else {
             victimize_page(page_color);
             pending_translations_[page_color].emplace_back(mmu_key);
@@ -573,7 +573,7 @@ void MMU::notify_clear_complete(unsigned cpu_id, engine::addr_t &physical_page)
 }
 
 inline
-void MMU::notify_migration_complete(engine::addr_t &source_addr, engine::addr_t &destination_addr, std::size_t &size)
+void MMU::notify_migration_complete(engine::addr_t &source_addr, engine::addr_t &destination_addr, std::size_t &size, uint64_t ip)
 {
     engine::addr_t page_color = (source_addr & color_mask_) >> color_offset_;
 
@@ -656,7 +656,7 @@ void MMU::notify_migration_complete(engine::addr_t &source_addr, engine::addr_t 
                 pgt_it->second.status_ = page_table_entry_t::MIGRATING;
                 pgt_it->second.timestamp_ = sim_->get_clock();
                 backward_migration_count_++;
-                dma_->memcpy(old_physical_address, source_addr, page_size_);
+                dma_->memcpy(old_physical_address, source_addr, page_size_, ip);
             }
         }
     }

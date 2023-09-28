@@ -164,7 +164,7 @@ typename SetDueling<CacheSet, Cache>::ptr_t
             std::cout << "training sets " << tr_set_lists[i] << std::endl;
             std::stringstream ss(tr_set_lists[i]);
             std::string tr_set;
-            while (std::getline(ss, tr_set, ',')) {
+            while (std::getline(dynamic_cast<std::istream&>(ss), tr_set, ',')) {
                 const std::size_t tr_set_num = std::stoull(tr_set);
                 std::cout << "training set " << tr_set_num << std::endl;
                 set_num_to_policy.emplace(tr_set_num, policies[i]);

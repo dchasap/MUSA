@@ -177,8 +177,12 @@ bool Controller<Message>::send_request(Output &output)
         } else if (this->victim_cache_.has_pending_writes()) {
             // We can send some of the victim lines:
             auto pending_write = victim_cache_.get_pending_write();
+						//Mitos: creating a request here, need to add arguments for pc and op
             output_request_buffer_.emplace_back(Request(Request::op_t::WRITE, pending_write.first,
-                    0, this->line_size_, 0, pending_write.second.get_dep_type(), pending_write.second.task_type_,
+                    0,
+										0, // pc
+										0, // op
+										this->line_size_, 0, pending_write.second.get_dep_type(), pending_write.second.task_type_,
                     -1, 0));
             // We mark the line as clean.
             victim_cache_.mark_as_clean(pending_write.first);
@@ -465,7 +469,7 @@ bool Controller<Message>::insert(const Request &request)
                 /* And if we need to send it, we do it. */
                 if (victim.second.dirty()) {
                     Log::debug4() << "[CacheL" << level_ << ":" << this->cpu_id_ << "] Evicting line from main cache.";
-                    add_output_request(Request::op_t::WRITE, victim.first, 0, this->line_size_);
+                    add_output_request(Request::op_t::WRITE, victim.first, 0, this->line_size_, 0, 0);
                     assert(evict_table_.find(victim.first) == evict_table_.end());
                     evict_table_[victim.first] = 1;
                 }
@@ -494,7 +498,7 @@ bool Controller<Message>::insert(const Request &request)
                     /* If the line is dirty, we write it back. */
                     if (victim.second.dirty()) {
                         Log::debug4() << "[CacheL" << level_ << ":" << this->cpu_id_ << "] Evicting line from victim cache..";
-                        add_output_request(Request::op_t::WRITE, victim.first, 0, this->line_size_);
+                        add_output_request(Request::op_t::WRITE, victim.first, 0, this->line_size_, 0, 0);
                         evict_table_[victim.first] = 1;
                     }
                     /* Now that the victim cache has space left, we evict from the cache. */
@@ -516,6 +520,7 @@ inline
 typename Message::Ack::op_t Controller<Message>::read_req(unsigned in, const Request& request)
 {
     Log::debug3() << "[CacheL" << level_ << ":" << this->cpu_id_ << "] read_req for " << request;
+		//std::cout << "[CacheL" << level_ << ":" << this->cpu_id_ << "] read_req for " << request << std::endl;
     const engine::addr_t addr = request.get_tag();
     const sim::engine::addr_t line_addr = addr & mask_;
     uint64_t user_code_id = request.get_user_code_id();
@@ -523,6 +528,30 @@ typename Message::Ack::op_t Controller<Message>::read_req(unsigned in, const Req
     if (line != NULL && (not line->locked())) {
         assert(line->state_ != CacheLine::INVALID);
         this->cache_.signal_event(request, cache_access_outcome_t::HIT);
+#ifdef ENABLE_MITOS
+				//std::cout << "\tHIT@" << std::hex << request.get_tag() << std::dec << std::endl;
+				utils::instrumentation::SelectedInstrumentation& instrumentation = this->simulator_.get_instance()->get_instrumentation();
+
+				uint64_t latency = 0; // latency is fixed, need to lookitup somehow
+				sim::engine::cycles_t time = this->simulator_.get_clock();
+				
+				//std::cout << "pre-op:" << request.get_op_name() << std::endl;
+				//std::cout << "pre-ip:" << request.get_ip() << std::endl;
+
+				instrumentation.add_precise_memory_event(
+            utils::instrumentation::InstrumentationItem {
+            static_cast<unsigned int>(this->cpu_id_),
+            0,
+            time,
+            utils::instrumentation::EVENT_RECORD,
+            utils::instrumentation::PreciseMemoryEvent {static_cast<uint8_t>(request.get_op_name()), // op
+																												request.get_ip(), // ip	
+																												request.get_tag(), 
+																												latency, 
+																												this->level_, 
+																												static_cast<uint64_t>(request.get_op())}});
+#endif
+
         stats_.read.hit[user_code_id]++;
         stats_.cache_read_hit_by_task_type[request.get_task_type()]++;
         stats_.update_access(true, request.get_dep_type(), request.get_task_type());
@@ -566,11 +595,13 @@ typename Message::Ack::op_t Controller<Message>::read_req(unsigned in, const Req
         /* do access again (for LRU update) */
         line = this->cache_.access(line_addr);
         assert(line != NULL);
+				//std::cout << "\tVICTIM_HIT@" << std::hex << request.get_tag() << std::dec << std::endl;
         stats_.victim_read.hit[user_code_id]++;
         stats_.victim_read_hit_by_task_type[request.get_task_type()]++;
         stats_.update_access(true, request.get_dep_type(), request.get_task_type());
         return Ack::op_t::READ;
     } else {
+				//std::cout << "\tVICTIM_MISS@" << std::hex << request.get_tag() << std::dec << std::endl;
         stats_.victim_read.miss[user_code_id]++;
         stats_.victim_read_miss_by_task_type[request.get_task_type()]++;
     }
@@ -592,7 +623,27 @@ typename Message::Ack::op_t Controller<Message>::read_req(unsigned in, const Req
         stats_.cache_read_miss_by_task_type[request.get_task_type()]++;
         stats_.update_access(false, request.get_dep_type(), request.get_task_type());
     } else if (mshr_entry->state_.value_ == MSHR::MSHRState::READY) {
-        stats_.read.hit[user_code_id]++;
+#ifdef ENABLE_MITOS
+				std::cout << "\tMSHR_HIT@" << std::hex << request.get_tag() << std::dec << std::endl;
+				utils::instrumentation::SelectedInstrumentation& instrumentation = this->simulator_.get_instance()->get_instrumentation();
+
+				uint64_t latency = 0; // latency is fixed, need to lookitup somehow
+				sim::engine::cycles_t time = this->simulator_.get_clock();
+								
+				instrumentation.add_precise_memory_event(
+            utils::instrumentation::InstrumentationItem {
+            static_cast<unsigned int>(this->cpu_id_),
+            0,
+            time,
+            utils::instrumentation::EVENT_RECORD,
+            utils::instrumentation::PreciseMemoryEvent {static_cast<uint8_t>(request.get_op_name()), // op
+																												request.get_ip(), // ip	
+																												request.get_tag(), 
+																												latency, 
+																												this->level_, 
+																												static_cast<uint64_t>(request.get_op())}});
+#endif
+				stats_.read.hit[user_code_id]++;
         stats_.update_access(true, request.get_dep_type(), request.get_task_type());
         stats_.cache_read_hit_by_task_type[request.get_task_type()]++;
         return Ack::op_t::READ; /* Cache hit */
@@ -739,7 +790,8 @@ typename Message::Ack::op_t Controller<Message>::flush_req(unsigned in, const Re
     if (line != NULL && line->state_ != CacheLine::ALLOCATED) {
         if (line->state_ == CacheLine::DIRTY) {
             Log::debug4() << "[CacheL" << level_ << ":" << this->cpu_id_ << "] Flush request genereates request.";
-            add_output_request(Request::op_t::WRITE, line_addr, 0, this->line_size_);
+            add_output_request(Request::op_t::WRITE, line_addr, 0, this->line_size_, 
+															request.get_op_name(), request.get_ip());
         }
         this->cache_.remove(addr);
         Log::debug4() << "[CacheL" << level_ << ":" << this->cpu_id_ << "] Flush request genereates request.";
@@ -800,7 +852,8 @@ typename Message::Ack::op_t Controller<Message>::clear_req(unsigned in, const Re
         if (line->state_ == CacheLine::DIRTY) {
             if (!evict_table_lookup(line_addr)) {
                 Log::debug4() << "[CacheL" << level_ << ":" << this->cpu_id_ << "] Clear Request genereates request.";
-                add_output_request(Request::op_t::WRITE, line_addr, 0, this->line_size_);
+                add_output_request(Request::op_t::WRITE, line_addr, 0, this->line_size_, 
+																	0, 0);
                 evict_table_[line_addr] = 1;
                 this->cache_.remove(line_addr);
             }
@@ -859,7 +912,9 @@ void Controller<Message>::data_ack(const Ack &ack)
             curr->pending_read_acks_--;
             if (line->state_ == CacheLine::DIRTY) {
                 Log::debug4() << "[CacheL" << level_ << ":" << this->cpu_id_ << "] Clear Request genereates request.";
-                add_output_request(Request::op_t::WRITE, addr, 0, this->line_size_);
+								// Mitos: this is an ack, we just put 0?
+                add_output_request(Request::op_t::WRITE, addr, 0, this->line_size_,
+																	0, 0);
                 evict_table_[addr] = 1;
                 this->cache_.remove(addr);
                 curr->pending_write_acks_++;
