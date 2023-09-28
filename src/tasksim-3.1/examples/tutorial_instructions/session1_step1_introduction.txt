@@ -1,0 +1,60 @@
+================== Step 1: Introduction =======================================
+
+In order to load MUSA you must first add the module. Regretfully it is not on
+the default list, so first its modulefile folder should be added to the module
+subsystem:
+
+$> module use -a /apps/ROMOL/musa/2.8/module/
+
+It is recomended that you add this command to the ~/.bashrc file, so it is
+automatically executed on all next logins.
+And then, we can load MUSA:
+
+$> module purge && module load musa
+
+We do module purge first in order to avoid having conflicts with other MPI
+implementations or C/C++/Fortran compilers.
+
+To check that MUSA has been properly loaded, we can perform:
+
+$> module list
+
+Which ouputs the following result:
+
+Currently Loaded Modules:
+  1) gcc/7.1.0   2) openmpi/1.10.4   3) EXTRAE/3.5.1   4) musa/2.8
+
+
+================== Submitting jobs ============================================
+
+This tutorial is run on MareNostrum 4, which uses the SLURM queue system.
+In order to submit jobs, you must use the sbatch command:
+
+$> sbatch script_name.bash
+
+To check the status of a submitted job, use the squeue command:
+
+$> squeue
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+             1516981      main     Musa bsc18292 PD       0:00      4 (Priority)
+
+You can also add the -l flag for a more verbose output, or -iN, to refresh the
+results every N seconds.
+$> squeue -l
+Fri Apr 27 10:40:16 2018
+             JOBID PARTITION     NAME     USER    STATE       TIME TIME_LIMI  NODES NODELIST(REASON)
+             1516981      main     Musa bsc18292  PENDING       0:00     20:00      4 (Priority)
+
+
+================== Fallback copies ============================================
+
+If at any moment during the tutorial you get lost, MareNostrum's queue system
+becomes unresponsive or you unvoluntarely delete the results of the previous
+steps, we have created a set of fallback copies. These copies contain the
+results of all the previous steps instructions, so you can follow the tutorial
+to the end.
+
+$> musa_fallack_recovery.bash SESSION STEP
+
+Executing either without parameters, -h or --help will print all available
+fallback steps.

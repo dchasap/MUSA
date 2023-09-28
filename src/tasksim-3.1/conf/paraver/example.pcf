@@ -1,0 +1,596 @@
+DEFAULT_OPTIONS
+
+LEVEL               THREAD
+UNITS               NANOSEC
+LOOK_BACK           100
+SPEED               1
+FLAG_ICONS          ENABLED
+NUM_OF_STATE_COLORS 45
+YMAX_SCALE          45
+
+
+DEFAULT_SEMANTIC
+
+THREAD_FUNC          Last Evt Val
+
+STATES
+0     Idle
+1     Running
+2     Not created
+3     Waiting a message
+4     Blocking Send
+5     Synchronization
+6     Test/Probe
+7     Scheduling and Fork/Join
+8     Wait/WaitAll
+9     Blocked
+10    Immediate Send
+11    Immediate Receive
+12    I/O
+13    Group Communication
+14    Tracing Disabled
+15    Others
+16    Send Receive
+17    Memory transfer
+18    Profiling
+19    On-line analysis
+20    Remote memory access
+21    Atomic memory operation
+22    Memory ordering operation
+23    Distributed locking
+24    Overhead
+25    One-sided op
+26    Startup latency
+27    Waiting links
+28    Data copy
+29    RTT
+30    Allocating memory
+31    Freeing memory
+
+
+STATES_COLOR
+0     {117,195,255}
+1     {0,0,255}
+2     {255,255,255}
+3     {255,0,0}
+4     {255,0,174}
+5     {179,0,0}
+6     {0,255,0}
+7     {255,255,0}
+8     {235,0,0}
+9     {0,162,0}
+10    {255,0,255}
+11    {100,100,177}
+12    {172,174,41}
+13    {255,144,26}
+14    {2,255,177}
+15    {192,224,0}
+16    {66,66,66}
+17    {255,0,96}
+18    {169,169,169}
+19    {169,0,0}
+20    {0,109,255}
+21    {200,61,68}
+22    {200,66,0}
+23    {0,41,0}
+24    {139,121,177}
+25    {116,116,116}
+26    {200,50,89}
+27    {255,171,98}
+28    {0,68,189}
+29    {52,43,0}
+30    {255,46,0}
+31    {100,216,32}
+
+
+EVENT_TYPE
+6    40000033    Executing CPU
+
+
+EVENT_TYPE
+6    40000001    Application
+VALUES
+0      End
+1      Begin
+
+
+EVENT_TYPE
+6    40000003    Flushing Traces
+VALUES
+0      End
+1      Begin
+
+
+EVENT_TYPE
+6    40000002    Trace initialization
+VALUES
+0      End
+1      Begin
+
+
+EVENT_TYPE
+6    40000036    Process IDentifier
+6    40000037    Parent Process IDentifier
+6    40000038    fork() depth
+
+
+EVENT_TYPE
+7    41999999   Active hardware counter set
+7    42000000   (PAPI_L1_DCM) Cache L1 data misses
+7    42000001   (PAPI_L1_ICM) Cache L1 instr misses
+7    42000002   (PAPI_L2_DCM) Cache L2 data misses
+7    42000003   (PAPI_L2_ICM) Cache L2 instrmisses
+7    42000004   (PAPI_L3_DCM) Cache L3 data misses
+7    42000005   (PAPI_L3_ICM) Cache L3 instr misses
+7    42000006   (PAPI_L1_TCM) Cache L1 total misses
+7    42000007   (PAPI_L2_TCM) Cache L2 total misses
+7    42000008   (PAPI_L3_TCM) Cache L3 total misses
+7    42000014   (PAPI_L3_LDM) Cache L2 total misses
+7    42000015   (PAPI_L3_STM) Cache L3 total misses
+7    42000023   (PAPI_L1_LDM) Cache L1 load misses
+7    42000024   (PAPI_L1_STM) Cache L1 store misses
+7    42000025   (PAPI_L2_LDM) Cache L2 load misses
+7    42000026   (PAPI_L2_STM) Cache L2 store misses
+7    42000029   (PAPI_L3_DCH) Cache L3 data hits
+7    42000034   (PAPI_MEM_SCY) Total number of stalled cycles due to memory access
+7    42000035   (PAPI_MEM_RCY) Total number of stalled cycles due to memory reads
+7    42000036   (PAPI_MEM_WCY) Total number of stalled cycles due to memory writes
+7    42000037   (PAPI_STL_ICY) Cycles with no instruction issued
+7    42000049   (PAPI_TOT_IIS) Total number of instruction issued
+7    42000050   (PAPI_TOT_INS) Total number of instructions completed
+7    42000053   (PAPI_LD_INS) Total number of load instructions
+7    42000054   (PAPI_ST_INS) Total number of store instructions
+7    42000055   (PAPI_BR_INS) Total number of branch instructions
+7    42000057   (PAPI_RES_STL) Cycles stalled on any resource
+7    42000059   (PAPI_TOT_CYC) Total cycles
+7    42000062   (PAPI_L1_DCH) Cache L1 data hits
+7    42000063   (PAPI_L2_DCH) Cache L2 data hits
+7    42000085   (PAPI_L1_TCH) Cache L1 total hits
+7    42000086   (PAPI_L2_TCH) Cache L2 total hits
+7    42000087   (PAPI_L3_TCH) Cache L3 total hits
+7    42000088   (PAPI_L1_TCA) Cache L1 total accesses
+7    42000089   (PAPI_L2_TCA) Cache L2 total accesses
+7    42000090   (PAPI_L3_TCA) Cache L3 total accesses
+7    42000091   (PAPI_L1_TCR) Cache L1 total reads
+7    42000092   (PAPI_L2_TCR) Cache L2 total reads
+7    42000093   (PAPI_L3_TCR) Cache L3 total reads
+7    42000094   (PAPI_L1_TCW) Cache L1 total writes
+7    42000095   (PAPI_L2_TCW) Cache L2 total writes
+7    42000096   (PAPI_L3_TCW) Cache L3 total writes
+7    42001000   (DRAM_LATENCY) RAM total latency
+7    42001001   (DRAM_COUNT) RAM number of operations
+7    42001002   (DRAM_OCCUPANCY) RAM average occupancy
+7    42001003   (DRAM_BLOCKED_CYCLES) RAM Requests blocked cycles
+7    42002000   (CPU_LD_FIN) CPU LD finished
+7    42002001   (CPU_ST_FIN) CPU ST finished
+7    42002002   (CPU_LD_ATIME) CPU LD atime
+7    42002003   (CPU_ST_ATIME) CPU ST atime
+7    42002004   (CPU_AMAT) CPU amat
+7    43000000   (CACHE_FREE_LINES) Cache free lines
+7    43000001   (CACHE_TOTAL_LINES) Cache total lines
+7    43001001   (INSTRUCTION_BUFFER_FILLED) Instruction buffer filled
+7    43002001   (CACHE_REQUEST) Cache request
+
+
+GRADIENT_COLOR
+0     {0,255,2}
+1     {0,244,13}
+2     {0,232,25}
+3     {0,220,37}
+4     {0,209,48}
+5     {0,197,60}
+6     {0,185,72}
+7     {0,173,84}
+8     {0,162,95}
+9     {0,150,107}
+10    {0,138,119}
+11    {0,127,130}
+12    {0,115,142}
+13    {0,103,154}
+14    {0,91,166}
+
+
+GRADIENT_NAMES
+0     Gradient 0
+1     Grad. 1/MPI Events
+2     Grad. 2/OMP Events
+3     Grad. 3/OMP locks
+4     Grad. 4/User func
+5     Grad. 5/User Events
+6     Grad. 6/General Events
+7     Grad. 7/Hardware Counters
+8     Gradient 8
+9     Gradient 9
+10    Gradient 10
+11    Gradient 11
+12    Gradient 12
+13    Gradient 13
+14    Gradient 14
+
+
+EVENT_TYPE
+0    9200021    User Function Location
+VALUES
+0   End
+1   0 (Unresolved)
+2   0 (_NOT_Found)
+3   96 (heat-ompss.c)
+4   100 (heat-ompss.c)
+5   21 (solver-ompss.c)
+
+
+EVENT_TYPE
+9    40000018    Tracing mode:
+VALUES
+1      Detailed
+2      CPU Bursts
+
+
+EVENT_TYPE
+0    9200006    Memory allocation in device cache
+
+
+EVENT_TYPE
+0    9200036    Dependence analysis
+
+
+EVENT_TYPE
+0    9200031    Number of blocking operations
+
+
+EVENT_TYPE
+0    9200020    Time on Yield (in nsecs)
+
+
+EVENT_TYPE
+0    9200030    Chunk size
+
+
+EVENT_TYPE
+0    9200008    Hit in the cache
+
+
+EVENT_TYPE
+0    9200013    Create WD Id:
+
+
+EVENT_TYPE
+0    9200039    Inside OpenCL runtime
+VALUES
+1       clCreateBuffer()
+2       clReleaseMemObject()
+3       clGetDeviceInfo()
+4       clCreateContext()
+5       clEnqueueWriteBuffer(blocking=true)
+6       clEnqueueReadBuffer(blocking=true)
+7       clCreateCommandQueue()
+8       Compile, build and clCreateKernel() nanox routine
+9       clEnqueueCopyBuffer() Device to device transfer
+10      clCreateSubBuffer(blocking=true)
+11      clEnqueueMapBuffer(blocking=true)
+12      clEnqueueUnmapMemObject(blocking=true)
+13      OpenCL generic event
+
+
+EVENT_TYPE
+0    9200032    Time on block (in nsecs)
+
+
+EVENT_TYPE
+0    9200028    Transfer size
+
+
+EVENT_TYPE
+0    9200012    User Code (wd)
+
+
+EVENT_TYPE
+0    9200017    Lock address
+
+
+EVENT_TYPE
+0    9200045    Work descriptor becomes blocked
+
+
+EVENT_TYPE
+0    9200029    Cache waiting for something
+VALUES
+1       registerCacheAccess() waiting for data allocation (not registered in directory)
+2       registerCacheAccess() waiting for data invalidation in another cache (new entry)
+3       registerCacheAccess() waiting for data to have no owner
+4       registerCacheAccess() waiting for data allocation (registered in directory)
+5       registerCacheAccess() waiting for data invalidation (size has changed)
+6       registerCacheAccess() waiting for data invalidation in another cache (size has changed)
+7       registerCacheAccess() waiting for data to be copied back (size has changed)
+8       registerCacheAccess() waiting for data invalidation in another cache (old version)
+9       registerCacheAccess() invalidating another cache
+10      registerCacheAccess() waiting for resize
+11      registerCacheAccess() waiting for flush
+12      freeSpaceToFit()
+13      waitInput()
+
+
+EVENT_TYPE
+0    9200043    Dependence address
+
+
+EVENT_TYPE
+0    9200022    Number of ready tasks in the queues
+
+
+EVENT_TYPE
+0    9200034    Time on scheduler operations (in nsecs)
+
+
+EVENT_TYPE
+0    9200015    Create WD num. deps.
+
+
+EVENT_TYPE
+0    9200033    Number of scheduler operations
+
+
+EVENT_TYPE
+0    9200005    Local copy in device memory
+
+
+EVENT_TYPE
+0    9200024    Loop lower bound
+
+
+EVENT_TYPE
+0    9200004    Transfer data to main memory
+
+
+EVENT_TYPE
+0    9200007    Memory free in device cache
+
+
+EVENT_TYPE
+0    9200019    Number of Yields
+
+
+EVENT_TYPE
+0    9200009    Copying WD inputs
+
+
+EVENT_TYPE
+0    9200037    Dependence direction
+
+
+EVENT_TYPE
+0    9200023    Number tasks in the graph
+
+
+EVENT_TYPE
+0    9200046    Debug Key
+
+
+EVENT_TYPE
+0    9200010    Copying WD outputs
+
+
+EVENT_TYPE
+0    9200038    Priority of a work descriptor
+
+
+EVENT_TYPE
+0    9200018    Number of Spins
+
+
+EVENT_TYPE
+0    9200044    Work descriptor becomes ready
+
+
+EVENT_TYPE
+0    9200001    Nanos Runtime API
+VALUES
+1       nanos_find_slicer()
+2       nanos_wg_wait_completion()
+3       nanos_create_xxx_cond()
+4       nanos_sync_cond_wait()
+5       nanos_sync_cond_signal()
+6       nanos_destroy_sync_cond()
+7       nanos_wait_on()
+8       nanos_init_lock()
+9       nanos_set_lock()
+10      nanos_unset_lock()
+11      nanos_try_lock()
+12      nanos_destroy_lock()
+13      nanos_single_guard()
+14      nanos_team_barrier()
+15      nanos_current_wd()
+16      nanos_get_wd_id()
+17      nanos_create_xxx_wd()
+18      nanos_submit()
+19      nanos_create_wd_and_run()
+20      nanos_set_internal_wd_data()
+21      nanos_get_internal_wd_data()
+22      nanos_yield()
+23      nanos_create_team()
+24      nanos_enter_team()
+25      nanos_leave_team()
+26      nanos_end_team()
+27      nanos_get_addr()
+28      nanos_copy_value()
+29      nanos_omp_barrier()
+30      nanos_get_implicit_threads()
+31      nanos_get_nonimplicit_threads()
+32      nanos_omp_find_worksharing()
+33      nanos_omp_get_schedule()
+34      nanos_malloc()
+35      nanos_free()
+36      nanos_get_num_ready_tasks()
+37      nanos_get_num_total_tasks()
+38      nanos_get_num_nonready_tasks()
+39      nanos_get_num_blocked_tasks()
+40      nanos_get_num_running_tasks()
+41      nanos_dependence_pendant_writes()
+42      nanos_in_final()
+43      nanos_set_final()
+44      nanos_dependence_release_all()
+45      nanos_set_translate_function()
+
+EVENT_TYPE
+0    9300001    Tasksim Event
+VALUES
+2       Nanos wg wait completion
+17      Nanos create work descriptor
+18      Nanos submit
+19      Nanos create work descriptor and run
+27      Nanos get address
+32      Work descriptor start
+33      User function name
+34      User code
+42      Nanos in final
+45      Nanos set translate function
+10050   wd id phase
+10051   user code phase
+10052   openmp locks phase
+10053   openmp threads phase
+
+EVENT_TYPE
+0    9200040    Call to the taskwait nanos runtime function
+
+
+EVENT_TYPE
+0    9200027    Inside CUDA runtime
+VALUES
+1       cudaMalloc()
+2       cudaFree()
+3       cudaMallocHost()
+4       cudaFreeHost()
+5       cudaMemcpyDeviceToDevice()
+6       cudaMemcpyDeviceToHost()
+7       cudaMemcpyHostToDevice()
+8       cudaMemcpyPeerAsync()
+9       cudaMemcpyAsyncDeviceToHost()
+10      cudaMemcpyAsyncHostToDevice()
+11      cudaInputStreamSynchronize()
+12      cudaOutputStreamSynchronize()
+13      cudaKernelStreamSynchronize()
+14      cudaDeviceSynchronize()
+15      cudaSetDevice()
+16      cudaGetDeviceProperties()
+17      cudaSetDeviceFlags()
+18      cudaGetLastError()
+19      CUDA generic event
+20      memcpy()
+
+
+EVENT_TYPE
+0    9200025    Loop upper
+
+
+EVENT_TYPE
+0    9200014    Create WD pointer:
+
+
+EVENT_TYPE
+0    9200002    Work Descriptor id:
+
+
+EVENT_TYPE
+0    9200042    Thread cpuid
+
+
+EVENT_TYPE
+0    9200026    Loop step
+
+
+EVENT_TYPE
+0    9200003    Transfer data into device cache
+
+
+EVENT_TYPE
+0    9200041    Number of Threads
+
+
+EVENT_TYPE
+0    9200035    Versioning scheduler decisions
+VALUES
+1       Set WD device + thread can run
+2       Set WD device + thread cannot run
+3       Select WD first record + thread can run
+4       Select WD first record + thread cannot run
+5       Select WD not enough records + thread can run
+6       Select WD undefined
+7       Select WD get first queue task
+8       At idle get first queue task
+9       At idle no first queue task found
+10      At prefetch get first queue task
+11      At prefetch get immediate successor
+12      At prefetch no first queue task found
+13      At before exit get first queue task
+14      At before exit no first queue task found
+15      Set earliest execution worker found
+16      Set earliest execution worker not found
+17      Found earliest execution worker timing reason
+18      Found earliest execution worker idle reason
+
+
+EVENT_TYPE
+0    9200016    Create WD dependence pointer
+
+
+EVENT_TYPE
+0    9000000    Thread state:
+VALUES
+0       NOT CREATED
+1       NOT RUNNING
+2       STARTUP
+3       SHUTDOWN
+4       ERROR
+5       IDLE
+6       RUNTIME
+7       RUNNING
+8       SYNCHRONIZATION
+9       SCHEDULING
+10      CREATION
+11      DATA TRANSFER TO DEVICE
+12      DATA TRANSFER TO HOST
+13      LOCAL DATA TRANSFER IN DEVICE
+14      DATA TRANSFER TO DEVICE
+15      DATA TRANSFER TO HOST
+16      LOCAL DATA TRANSFER IN DEVICE
+17      CACHE ALLOC/FREE
+18      YIELD
+19      ACQUIRING LOCK
+20      CONTEXT SWITCH
+27      EXTRAE I/O
+
+
+EVENT_TYPE
+0    9000001    Point-to-point origin
+
+
+EVENT_TYPE
+0    9000002    Point-to-point destination
+
+
+EVENT_TYPE
+0    9000004    Thread sub-state
+VALUES
+0       NOT CREATED
+1       NOT RUNNING
+2       STARTUP
+3       SHUTDOWN
+4       ERROR
+5       IDLE
+6       RUNTIME
+7       RUNNING
+8       SYNCHRONIZATION
+9       SCHEDULING
+10      CREATION
+11      DATA TRANSFER TO DEVICE
+12      DATA TRANSFER TO HOST
+13      LOCAL DATA TRANSFER IN DEVICE
+14      DATA TRANSFER TO DEVICE
+15      DATA TRANSFER TO HOST
+16      LOCAL DATA TRANSFER IN DEVICE
+17      CACHE ALLOC/FREE
+18      YIELD
+19      ACQUIRING LOCK
+20      CONTEXT SWITCH
+27      EXTRAE I/O
+

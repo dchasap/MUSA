@@ -1,0 +1,47 @@
+================== Step 6: Simulation integration and analysis ================
+
+At this point we have all the individual phase simulated, but not a coherent
+result. In order to have something coherent we need ot integrate all the phase
+results in a single simulated trace.
+
+In order to do that we need to go to the integration folder:
+
+$> cd TRACE_sp-mz.A.4_000004_MEMO/SIMULATION/A2_INTEGRATION_PRESIM
+
+This folder contains the scripts to run all Dimemas simulations. Dimemas will
+execute a simulation of the comunication network in order to simulate the MPI
+event duration, and will use TaskSim's phase results for the regions outside of
+MPI.
+
+To run the integration we execute:
+
+$> ./integrate_dimemas_simulations.bash
+
+The result of said integration is a set of Paraver trace, one for each of the
+configurations that we have run the TaskSim's simulations.
+
+The result traces are on:
+ - TRACE_sp-mz.A.4_000004_MEMO/SIMULATION/A2_INTEGRATION_PRESIM/trace_SIMULATED
+
+We can open several of them side-by said to compare them:
+
+$> module load paraver
+$> paraver trace_SIMULATED/MUSA_sp-mz.B.4_000016cores_mn4_musa_presim.prv &
+                                                                 ^
+                                                                 Ampersand
+$> paraver trace_SIMULATED/MUSA_sp-mz.B.4_000004cores_mn4_musa_presim.prv 
+
+When opening both files' default view we can observe the difference in total
+simulated time, and the difference between each phase individually. We can also
+observe that some phases do not change in simulated time.
+
+Ih order to compare this results with the native execution, we can go back to
+the base folder and run again the speedup graph script and view the differences
+between the native execution and the burst mode simulation..
+
+$> ./generate_speedup_graph.bash
+
+We can observe that the burst mode simulation is not able to properly
+simulate the time penalties when running in more than one thread and
+predicts a significant higher speed up before reaching the limit imposed
+by the benchmark workload.

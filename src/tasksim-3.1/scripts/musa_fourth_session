@@ -1,0 +1,34 @@
+#!/bin/bash
+app="iso_sve_ompss"
+args="3 96 96 96 1 64 0 64"
+vector_size_list="128 256 512 1024 2048"
+config_list="musa_sve_template_A.conf musa_sve_template_B.conf musa_sve_template_C.conf musa_sve_template_D.conf"
+scalar_app=${app//sve/scalar}
+mkdir -p logs
+
+ln -s ${MUSA_HOME}/benchmarks/${app} .
+ln -s ${MUSA_HOME}/benchmarks/${app}_instr .
+ln -s ${MUSA_HOME}/benchmarks/${scalar_app} .
+ln -s ${MUSA_HOME}/benchmarks/${scalar_app}_instr .
+
+sed -e "s/APPNAME/${app}/g" \
+    -e "s/APP_ARGUMENTS/${args}/g" \
+    < ${MUSA_HOME}/tasksim/etc/examples/musa_tutorial_generate_sve_traces.bash \
+    > ./musa_tutorial_generate_sve_traces.bash
+
+for config in $config_list; do
+    cp ${MUSA_HOME}/tasksim/etc/conf/${config} .
+done
+
+sed -e "s/APPNAME/${app}/g" \
+    -e "s/APP_ARGUMENTS/${args}/g" \
+    -e "s/SVE_REGISTER_SIZE_LIST/${vector_size_list}/g" \
+    -e "s/CONFIG_LIST/$config_list/g" \
+    < ${MUSA_HOME}/tasksim/etc/examples/musa_tutorial_sve_simulations.bash \
+    > ./musa_tutorial_sve_simulations.bash
+cp ${MUSA_HOME}/tasksim/etc/examples/plots/*.plot .
+cp ${MUSA_HOME}/tasksim/etc/examples/plots/extract_data*.bash .
+chmod 755 extract_data*.bash
+cp ${MUSA_HOME}/tasksim/etc/examples/step1_tracing/dark2.pal .
+chmod 755 extract_data.bash
+

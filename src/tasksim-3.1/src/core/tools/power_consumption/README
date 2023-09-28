@@ -1,0 +1,64 @@
+===============
+Mcpat analysis
+===============
+TaskSim - McPAT
+===============
+
+The script reads the parameters from the TaskSim results file and the configuration file in order to generate a McPAT input file with all the information required to run McPAT.
+
+McPAT (Multicore Power, Area, and Timing) is the first integrated power, area, and timing modeling framework for multithreaded and multicore/many-core processors.
+
+Usage:
+
+./tasksim-mcpat.py --out=McPAT-input_name <TaskSim config file> <TaskSim results file> <Private L2 (0 shared/coherent, 1 private)> <L3 (0 no, 1 yes)>
+
+The template used to generate the input of McPAT can be found at templates/mcpat-input.xml.  
+
+============
+Requirements
+============
+* The script uses jinja2 python module in order to parse the information from TaskSim files to the template.
+
+===============
+McPAT execution
+===============
+
+After generation the McPAT input file, we have to execute McPAT:
+
+./mcpat -infile $McPAT-input_name -print_level 2 > $power_stats_file
+
+=======
+Paraver
+=======
+
+A new feature to compute the power consumption using a Paraver trace.
+
+It is necessary to generate a Paraver configuration file with the different cache accesses of the different cache levels, then multiply the different cache accesses for the power consumption of a cache access (calculated by McPAT).
+
+To obtain the power consumption of a cache access it is needed to print the following values:
+* dcache.caches->local_result.power.readOp.dynamic and dcache.caches->local_result.power.writeOp.dynamic from McPAT/core.cc for the cache DL1 .
+* unicache.caches->local_result.power.writeOp.dynamic and unicache.caches->local_result.power.readOp.dynamic from McPAT/sharedcache.cc for the cache L2.
+
+Usage:
+
+./mcpat-paraver.sh
+
+
+The script executes McPAT, collects the values mentioned above and prints them to the Paraver configuration file. Then we have to select the Paraver configuration file from Paraver/cfgs/Total.cfgs
+
+For each trace, the Paraver configuration file generates four different plots:
+* Gradient color dynamic power consumption (W).
+* Function line dynamic power consumption (W).
+* Aggregated dynamic power consumption (W).
+* Core burst.
+
+
+===========================
+Changes from first version:
+===========================
+
+As some of the statistics labels and configuration parameters have changed, so has the script:
+
+* CPU frequency now is read from the configuration file (cpu_freq).
+* Module assignment to cores is now fixed (the logic is now simpler).
+* First implementation confused the CPU RAS (Return Address Stack) size with the RAM RAS (Row Access Strobe [ns]). Now is 64 (as McPAT's Xeon example).

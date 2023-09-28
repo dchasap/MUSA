@@ -1,0 +1,23 @@
+================== Step 3: Native run =========================================
+
+In order to have some data to compare against, first we must run the
+benchmark natively on MareNostrum 4.To do so we have prepared a script:
+native_run.bash. This script will run sp-mz with 4 MPI ranks and a different
+number of cores per MPI rank. This will be done with the Nanos++ flag
+"--smp-workers".
+
+To send the job:
+
+$> sbatch native_run.bash
+
+This native executions should only take a couple of minutes, and the results
+will be stored in the native_logs/ directory.
+
+Once the native edxecutions have finished, we can generate the speed-up graph
+with the generate_speedup_graph.bash script:
+
+$> ./generate_speedup_graph.bash
+
+This will gather the execution times from the logs (and later the simulation
+execution times). Thus giving us a baseline to compare our simulations
+against.

@@ -1,0 +1,43 @@
+================== Step 2: Enviroment setup ===================================
+
+In order to get started with the tutorial, we need to create a folder to
+contain the material that we will use during the tutorial.
+(This should be performed at either projects or scratch folders):
+  - /gpfs/projects/$group/$user/
+  - /gpfs/scratch/$group/$user/
+
+$> mkdir musa_tutorial && cd musa_tutorial
+
+Once there, we can execute the MUSA startup command. This command will copy all
+the initial scripts needed to realize the first two tutorial sessions:
+
+$> musa_start.bash
+
+The files copied will be:
+ - dark2.pal: color palette for gnuplot.
+ - generate_speedup_graph.bash: script used to generate the speed-up graph
+ - job_tracer.bash: script used to generate the burst mode trace
+ - job_tracer_memory.bash: script used to generate the memory mode trace.
+ - mn4_musa.conf: default hardware configuration file for the tutorial.
+ - native_run.bash: script to execute the benchmark natively and extract duration
+ - speedup.plot: gnuplot script to generate the speed-up graph
+ - musa_tutorial_instructions/: folder containing the tutoriual how-tos.
+
+But in order to be able to generate a speed-up graph, we need a benchmark:
+
+$> musa_load_tracing_example.bash
+
+this will have copied:
+ - spmz/ folder containing the sp-mz benchmark code
+ - sp-mz.B.4: link to the benchark compiled with Mercurium with
+              the --ompss flag
+ - sp-mz.B.4_instr: link to the benchmark compiled with Mercurium with 
+                    the --ompss --instrument flags.
+
+For this tutorial SP has been compiled with 4 MPI Ranks and B class input.
+The instrumented binary has been compiled activating Nanos++'s instrumentation
+plugin, which will record OpenMP/OmpSs parallelism primitives and the duration
+of each phase.
+The non-instrumented binary will be used for the native executions, MPI-level
+trace extraction and, when run under DynamoRIO, a trace containing the
+instructions and memory accesses for each OpenMP/OmpSs task.

@@ -1,0 +1,41 @@
+================== Step 5: Burst mode simulation ==============================
+
+Once we have the burst mode trace. We can start the simulations.
+For this we should go to the presimulation folder:
+
+$> cd TRACE_sp-mz.A.4_000004_BRST/SIMULATION/A1_PRESIM
+
+This folder will contain a set of scripts to generate the different
+simulation commands, and the set of configuration files to run those
+simulations. This configuration files have been modified with the
+different number of cores from the one we had on the our initial directory.
+
+In order to generate all the simulation caommands we must execute:
+
+$> ./generate_musa_presim.bash
+
+This command reads the burst mode trace and for each section between MPI events
+it generates a command to simulate said region with TaskSim. It will generate
+one simulation command per rank and number of cores per MPI rank.
+
+The number of simulations will end reaching 10.000, so it is better to run them
+throught greasy.
+
+Greasy is a utility that reads a file and runs each line as a separate command.
+It manages all cores in a node in order to run them in parallel, making
+the simulation process much easier. It also provides restart files in case of
+error, which we should not need for this tutorial.
+
+This command generates one folder per configuration file in which the
+simulation will be run and the results stored. It generates an greasy file for
+each of the configurations and finally, a global greasy file to run
+all simulations.
+
+For this turorial we will run this last file with all simulation commands as
+they are short enough.
+
+To launch the simulation to MareNostrum4:
+
+$> sbatch launch_all_musa_presims.bash
+
+This simulations will take around 3 minutes.

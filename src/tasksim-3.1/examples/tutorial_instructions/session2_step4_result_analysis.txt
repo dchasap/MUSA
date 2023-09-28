@@ -1,0 +1,31 @@
+-------------------------------------------------------------------------------
+Session 2; Memory mode simulation
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+Step 4: Memory simulations result analysis
+-------------------------------------------------------------------------------
+
+In the last integration step we have generated one Paraver trace for each selected
+configuration (in this example 1, 2, 4, 8 or 16 cores per MPI rank). These
+traces are located on:
+ + TRACE_sp-mz.A.4_000004_MEMO/SIMULATION/A2_INTEGRATION/traces_SIMULATED/
+And have the following names:
+ + MUSA_sp-mz.A.4_${cores}cores_presim.prv
+ (row and pcf contain auxiliary information for Paraver).
+
+In order to open Paraver to examine the trace we execute:
+
+$> module load paraver
+$> wxparaver MUSA_sp-mz.A.4_000004cores_mn4_musa_presim.prv
+
+   To view the behavior load the MPI Call configuration located on oyur home dir.
+   ~/MPI_call.cfg
+
+These traces can be analyzed online with Paraver, or offline with Paramedir,
+which can use Paraver configuration files to execute bash jobs to extract
+the desired statistics.
+
+As a final step, we can regenerate the SpeedUp graph comparing native vs. Burst vs.
+Memory:
+
+$> ./generate_speedup_graph.bash 

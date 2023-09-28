@@ -1,0 +1,62 @@
+-------------------------------------------------------------------------------
+Session 2; Memory mode simulation
+-------------------------------------------------------------------------------
+
+-----------------------------
+Step 1: Generate Memory trace
+-----------------------------
+
+In order to generate a memory mode trace we use the script
+job_tracer_memory.bash.
+If we open it we can observed that it contains:
+
+ - SLURM directives.
+ - MUSA configuration options:
+ - APPNAME: application binary name
+ - ARGS: application arguments
+ - RANKS: number of MPI ranks
+ - MEMORY_MODE: boolean value that determines if the trace is in burst or memory modes
+   - Memory mode variables (which we can ignore at the moment): 
+     - TSMPI_MEM_PHASES_INIT: first OpenMP/OmpSs phase that will be traced in memory mode.
+     - TSMPI_MEM_PHASES_NUM: number of OpenMP/OmpSs phases that will be traced in memory mode.
+     - TSMPI_RANK_INIT: first MPI rank from which to stract memory mode information.
+     - TSMPI_RANK_NUM: number of ranks from which to stract memory mode information.
+ - TSMPI_SIM_CONFIG: TaskSim's simulator hardware configuration 
+ - TSMPI_SIM_CORES: list with the number of cores per MPI rank to simulate.
+
+The values are already the ones we need for the tutorial. To launch it on
+MareNostrum4 run:
+
+$> sbatch job_tracer_memory.bash
+
+After some time executing the job (~20 minutes) the job should finish,
+and the error log should only contain output from the module load events.
+
+(Remember that you can check the job status with squeue).
+
+The trace that has now been generated contains the same information
+that the burst trace contained, plus the list of executed instructions and
+the memory addresses accessed, separated by WorkDescriptor/Task (OmpSs
+nomenclature) for the selected mpi_phases.
+
+  - Contained on TRACE_sp-mz.A.4_000004_MEMO/TRACE/trace_ts/
+    Memory addresses are the .mem. files and basic blocs execxuted on the
+    .bbl. and .dict. files.
+
+Also it contains all the information we had on the Burst mode trace:
+
+ + In TRACE_sp-mz.A.4_000004_MEMO/LOGS/ there are logs for each step taken
+   during the trace generation.
+ + In TRACE_sp-mz.A.4_000004_MEMO/TRACE/trace_prv there is a Paraver trace.
+   It contains information about the behavior of the application during a
+   native run. It can be visualized with Paraver.
+ + TRACE_sp-mz.A.4_000004_MEMO/LOGS/ now contains an extra set of logs
+   for the tracing of instructions an memory addresses.
+ + In TRACE_sp-mz.A.4_000004_MEMO/SIMULATION/A1_PRESIM we will find the
+   scripts necessary to execute the simulations.
+ + Inside said folder we will find a set of configuration files, extended
+   from marenostrum_configuration.conf which was copied on the root directory.
+   These different versions have a different number of cores per MPI_rank and
+   different simulation modes (MEMORY or BURST_ONLY). These will be used as
+   configuration files for TaskSim to run the single rank simulation of the
+   mpi_phases.

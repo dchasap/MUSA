@@ -1,0 +1,201 @@
+================== Notes ======================================================
+
+Even if it is needed to copy the trace generation and execution scripts,
+The scripts will load the module musa themselves. That means it is not
+necessary to load the module before launching a tracing or simulation script.
+
+MUSA uses two different simulators:
+ + TaskSim for single core simulations.
+ + Dimemas to simulate MPI multicore communications.
+
+MUSA needs that the application it traces/simulates to be compiled with
+Mercurium and be MPI+OmpSs or MPI+OpenMP.
+MUSA also needs that the applications link to the Nanox runtime (automatic
+when compiling with Mercurium with the --ompss flag).
+
+All the relevant paths are included when performing module load musa on MareNostrum.
+
+For this example, an already compiled application (BT) is provided.
+
+================== Instructions ===============================================
+
+In order to generate a MUSA trace you need two binaries:
+
+ - APP: compiled with Mercurium with the --ompss flag
+ - APP_instr: compiled with Mercurium with the --ompss --instrument flags.
+
+Mercurium has multiple binaries mcc for C, mcxx for C++, mfc and mf95 for Fortran.
+
+IMPORTANT: the binaries should be linked to the same directory where
+           the main script (job_tracer.bash) is located.
+
+For the Tutorial purposes you can execute
+
+$> musa_load_tracing_example.bash
+
+This will copy the BT benchmark with the A input set and configured for 4 ranks.
+It will also make the appropiate links so the binary is on the same directory
+as the tracing script.
+
+
+----------------------------
+Step 1: Generate Burst trace
+----------------------------
+
+We will employ the provided templated script. To launch it on MareNostrum4 run:
+
+$> sbatch job_tracer.bash
+
+Once the job finishes, a folder TRACE_bt-mz.A.4_000004_BRST/ should be generated as well
+as two log files. The stderr log file should be empty, and the stdout log should have
+the step by step information of what has been done.
+
+The generated burst trace only stores information about the duration of the differents phases,
+there is no information on the executed instructions or the memory address accessed.
+
+
+ + In TRACE_bt-mz.A.4_000004_BRST/LOGS/ there are logs for each step taken during
+   the trace generation.
+ + In TRACE_bt-mz.A.4_000004_BRST/TRACE/trace_prv there is a Paraver trace.
+   It contains information about the behavior of the application, and can be
+   visualized with Paraver:
+   $> /apps/BSCTOOLS/wxparaver/4.6.4.rc1/bin/wxparaver TRACE_bt-mz.A.4_000004_BRST/TRACE/trace_prv/trace_bt-mz.A.4.prv
+   To view the behavior, load the MPI Call configuration located on:
+   /apps/BSCTOOLS/wxparaver/4.6.4.rc1/cfgs/mpi/views/MPI_call.cfg
+ + In TRACE_bt-mz.A.4_000004_BRST/TRACE/trace_ts there are the TaskSim Burst-mode traces.
+   These traces contain a set of traces per rank.
+ + The trace files named ${APP}_proc_${RANK}.ts.mpiphases contain a plain text description
+   of the mpi phases executed by the appllication.
+   Each line corresponds to a different mpi_phases, and the values mean:
+
+   - Index:MasterWorkDescriptorID:NanosCode?:InMemory?:MPI_ID:MPI_NAME
+
+     - Index is just the mpi_phase index.
+     - MasterWorkDescriptorID is the ID assigned to that mpi_phase master work
+       descriptor (Usefull for interna TaskSim purposes only).
+     - NanosCode? A boolean that tells if that MPI phase contains Nanos Code (Tasks).
+     - InMemory? A boolean that tells if that MPI phase has been traced in
+       memory mode (only if NanosCode? is true/1).
+     - MPI_ID Identifier of the MPI call that separates the current phase from the next.
+     - MPI_NAME The bane of said MPI call.
+
+ + With these information we can know the structure of the application. And select which
+   representative region we want to trace in memory mode. In order to do that, we can
+   modify the job_tracer.bash script's parameters:
+     - TSMPI_MEM_PHASES_[INIT,NUM]: identify which phases that contain Nanos Code will
+       be traced in memory mode.
+     - TSMPI_RANK_[INIT,NUM]: idenfity which ranks will be traced on memory mode.
+   Both variables are 1-indexed.
+
+
+-----------------------------
+Step 2: Generate Memory trace
+-----------------------------
+
+We provide a version that already has these parameters modified - job_tracer_memory.bash
+$> sbatch job_tracer_memory.bash
+
+After some time executing the job (~20 minutes) the job should finish,
+and the error log should only contain output from the module load events.
+
+The trace that has now been generated contains the same information
+that the burst trace contained, plus the list of executed instructions and
+the memory addresses accessed, separated by WorkDescriptor/Task (OmpSs
+nomenclature) for the selected mpi_phases.
+
+ + TRACE_bt-mz.A.4_000004_MEMO/LOGS/ now contains an extra set of logs
+   for the tracing of instructions an memory addresses.
+ + In TRACE_bt-mz.A.4_000004_MEMO/SIMULATION/A1_PRESIM we will find the
+   scripts necessary to execute the simulations.
+ + Inside said folder we will find a set of configuration files, extended
+   from marenostrum_configuration.conf which was copied on the root directory.
+   These different versions have a different number of cores per MPI_rank and
+   different simulation modes (MEMORY or BURST_ONLY). These will be used as
+   configuration files for TaskSim to run the single rank simulation of the
+   mpi_phases.
+
+
+------------------------------------------
+Step 3: Simulating mpi_phases with TaskSim
+------------------------------------------
+
+The mpi_phases simulations will be performed on:
+ + TRACE_bt-mz.A.4_000004_MEMO/SIMULATION/A1_PRESIM.
+
+To generate the list of commands that will launch TaskSim single rank
+simulations we execute:
+
+$> ./generate_musa_presim.bash
+
+This will generate a set of greasy files with the commands for the simulations
+and a set of launch_*.bash scripts to submit those jobs to MareNostrum's queue
+system. On larger benchmarks it is useful to submit the jobs separately, but
+in order to ease the process we can just execute:
+
+$> ./submit_everything.bash
+
+This should submit 10 jobs, the longer of which will take ~15 miuntes.
+
+This jobs will simulate all traced mpi_phases for all ranks, in memory mode
+whenever availabe, and in burst mode otherwise.
+ + Those results are in TRACE_bt-mz.A.4_000004_MEMO/SIMULATION/A1_PRESIM/musa_out_bt-mz.A.4_000008\
+   /marenostrum_configuration_000008_BRST/marenostrum_configuration_000008_BRST.dat
+   (for the simulations in burst mode for the 8 cores per rank configuration).
+
+Before being able to merge the different parts of the simulation, we must
+calculate a correction factor, as the mpi_phases simulated on burst mode will
+use the real time duration of the host system, which may differ from the one
+specified in the memory mode configuration. This is done in one core per
+MPI rank simulation and used in all of them.
+
+$> ./extrapolate_burst_duration.bash
+
+This will have created a separate set of .dat files with the sufix _FINAL.
+These will be the set of results that we will integrate for our final
+integration.
+
+If at any point in the simulations with TaskSim there is an error and
+the simulations have to be relaunched, we must execute the cleanup script.
+This script will remove all partial results and scripts generated by
+generate_musa_presim.bash. Then we can regenerate the simulations again.
+
+(ONLY ON ERROR) $> ./cleanup.bash
+
+---------------------------------------
+Step 4: Integrating TaskSim Simulations
+---------------------------------------
+
+The integration step will be performed on:
+ + TRACE_bt-mz.A.4_000004_MEMO/SIMULATION/A2_INTEGRATION.
+In this folder there is a set of scripts and configuration files to execute Dimemas
+with the appropiate configuration. To integrate all traces, we execute:
+
+$> ./integrate_dimemas_simulations.bash
+
+This last integration step will generate one Paraver trace for each selected
+configuration (in this example 1, 2, 4, 8 or 16 cores per MPI rank). These
+traces are located on:
+ + TRACE_bt-mz.A.4_000004_MEMO/SIMULATION/A2_INTEGRATION/traces_SIMULATED/
+And have the following names:
+ + MUSA_bt-mz.A.4_${cores}cores_presim.prv
+ (row and pcf contain auxiliary information for Paraver).
+
+In order to open Paraver to examine the trace we execute:
+
+$> /apps/BSCTOOLS/wxparaver/4.6.4.rc1/bin/wxparaver TRACE_bt-mz.A.4_000004_MEMO/SIMULATION/A2_INTEGRATION/traces_SIMULATED/MUSA_bt-mz.A.4_000004cores_presim.prv
+
+   To view the behavior load the MPI Call configuration located on:
+   /apps/BSCTOOLS/wxparaver/4.6.4.rc1/cfgs/mpi/views/MPI_call.cfg
+
+These traces can be analyzed online with Paraver, or offline with Paramedir,
+which can use Paraver configuration files to execute bash jobs to extract
+the desired statistics.
+
+
+
+=================================== THE END =================================
+
+This is all for MUSA's intruductory tutorial. If you have any further
+questions do not hesitate to ask them to:
+ + francesc.martinez@bsc.es
+

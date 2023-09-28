@@ -1,0 +1,54 @@
+NANOX ?= nanox
+MCXX ?= mcxx
+
+GIT ?= git
+AUTORECONF ?= autoreconf
+PMURL ?= http://pm.bsc.es/git
+
+CORES := $(shell grep processor /proc/cpuinfo | wc -l)
+
+abs_top_srcdir = @abs_top_srcdir@
+abs_top_builddir = @abs_top_builddir@
+nanox_install_path = @nanox_install_path@
+
+.PHONY: $(NANOX)-bin $(MCXX)-bin $(NANOX)-build $(MCXX)-build $(NANOX)-clean $(MCXX)-clean all install clean
+
+all: $(NANOX)-build $(MCXX)-build
+
+install: $(NANOX)-bin $(MCXX)-bin
+
+clean: $(NANOX)-clean $(MCXX)-clean
+
+$(NANOX)-src:
+	$(GIT) clone $(PMURL)/nanox.git $(NANOX)-src
+	(cd $(NANOX)-src; $(AUTORECONF) -if)
+
+$(NANOX)-obj: $(NANOX)-src
+	mkdir -p $(NANOX)-obj
+	(cd $(NANOX)-obj; CPPFLAGS="-I$(abs_top_builddir) -std=c++0x" ../$(NANOX)-src/configure --prefix=$(nanox_install_path) --disable-allocator --with-nextsim=$(abs_top_srcdir))
+	
+$(NANOX)-build: $(NANOX)-obj
+	(cd $(NANOX)-obj; make -j $(CORES))
+	
+$(NANOX)-bin: $(NANOX)-build
+	(cd $(NANOX)-obj; make install)
+
+$(NANOX)-clean:
+	rm -rf $(NANOX)-obj; rm -rf $(NANOX)-src
+
+$(MCXX)-src:
+	$(GIT) clone $(PMURL)/mcxx.git $(MCXX)-src
+	(cd $(MCXX)-src; $(AUTORECONF) -if)
+
+$(MCXX)-obj: $(MCXX)-src $(NANOX)-bin
+	mkdir -p $(MCXX)-obj
+	(cd $(MCXX)-obj; ../$(MCXX)-src/configure --enable-tl-openmp-nanox --with-nanox=$(nanox_install_path) --enable-tl-superscalar --with-superscalar-runtime-api-version=4 --prefix=$(nanox_install_path))
+
+$(MCXX)-build: $(MCXX)-obj
+	(cd $(MCXX)-obj; make -j $(CORES))
+
+$(MCXX)-bin: $(MCXX)-build
+	(cd $(MCXX)-obj; make install)
+
+$(MCXX)-clean:
+	rm -rf $(MCXX)-obj; rm -rf $(MCXX)-src

@@ -1,0 +1,70 @@
+#%Module 
+
+# CAA HPC user environment
+#
+# test module file
+# Author                : callande@bsc.es
+# Last modification by  : callande@bsc.es
+# January 11, 2017
+#
+
+
+### version 2.5.3 updates
+##       - minor update: has been tested with bt, hydro
+##           and specfem3d (only burst), temoprary 
+##           until bug with memory mode is fixed
+##       - pintool for openmp not updated yet.  TODO
+
+## version 2.5.2 updates:
+##       - OpenMP support
+##       - Removed memory overhead on nextsim plugin
+##     To be done:
+##       - update memory plugin (update pin and change to dynamo rio)
+##       - change ad-hoc tasksim_presim for a new wrapper for greasy
+##
+
+
+#### dependencies
+
+## this version of openmpi doesnt work with the ompss_mpi_perf.
+## the fork and wait process is not working as expected. 
+## tracing not possible with this technique. 
+## To provide support, the tracer should be changed to a 
+## mechanism using Spawn_Comm_multiple simirarly as the ompss_mpi_mem  does.
+#module load openmpi/1.8.1
+
+### tested and valid
+module load openmpi/1.8.5
+module load gcc/4.7.2
+
+
+### mejor renidmiento en aplicaciones
+### sin soporte en la compilacion (aun)
+#module load gcc/6.1.0
+#module load openmpi/2.0.1
+
+#### version
+module-whatis "BSC_MUSA v.2.5.4 -- formato rle"
+
+
+#### instalation paths
+set                 devel                    /gpfs/projects/bsc18/romol/MUSA.2.5.4_rle
+
+append-path         LD_LIBRARY_PATH          /apps/CEPBATOOLS/deps/papi/5.3.0/lib
+#### release
+prepend-path        PATH                     ${devel}/03_install/dimemas/bin
+setenv              DIMEMAS_HOME             ${devel}/03_install/dimemas
+
+prepend-path        PATH                     ${devel}/03_install/mcxx/bin
+prepend-path        PATH                     ${devel}/03_install/nanox/bin
+
+setenv              MUSA_HOME                ${devel}
+prepend-path        PATH                     ${devel}/03_install/tasksim_rle/bin
+prepend-path        LD_LIBRARY_PATH          ${devel}/03_install/tasksim_rle/lib
+setenv              TS_PHASE_WRAPPER         ${devel}/03_install/tasksim_rle/lib/libtsmpi.so
+setenv              TS_PINTOOL_PATH          ${devel}/03_install/tasksim_rle/lib/libompss-trace.so
+
+setenv              TS_PIN_PATH              ${devel}/deps/soft/pin/pin.sh
+
+
+

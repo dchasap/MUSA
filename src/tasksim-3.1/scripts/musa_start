@@ -1,0 +1,65 @@
+#!/bin/bash
+
+
+function copy_musa_start_files() {
+  APP=$1
+  ARGS=$2
+  NRANKS=$3
+  CORELIST=$4
+  sed -e "s/APPNAME=.*/APPNAME=$APP/g" \
+      -e "s#ARGS=.*#ARGS=\"$ARGS\"#g" \
+      -e "s/#SBATCH --ntasks=4/#SBATCH --ntasks=$NRANKS/g" \
+      -e "s/RANKS=.*/RANKS=$NRANKS/g" \
+      -e "s/export TSMPI_SIM_CONFIG=.*/export TSMPI_SIM_CONFIG=\"mn4_musa.conf\"/g" \
+      -e "s/.*TSMPI_SIM_CORES.*/export TSMPI_SIM_CORES=\"$CORELIST\"/g" < $basedir/step1_tracing/job_tracer.bash >job_tracer.bash
+
+  sed -e "s/APPNAME=.*/APPNAME=$APP/g" \
+      -e "s#ARGS=.*#ARGS=\"$ARGS\"#g" \
+      -e "s/#SBATCH --ntasks=4/#SBATCH --ntasks=$NRANKS/g" \
+      -e "s/RANKS=.*/RANKS=$NRANKS/g" \
+      -e "s/export TSMPI_SIM_CONFIG=.*/export TSMPI_SIM_CONFIG=\"mn4_musa.conf\"/g" \
+      -e "s/.*TSMPI_SIM_CORES.*/export TSMPI_SIM_CORES=\"$CORELIST\"/g" < $basedir/step1_tracing/job_tracer_memory.bash >job_tracer_memory.bash
+  cp ${MUSA_HOME}/tasksim/etc/conf/mn4_musa.conf .
+  cp $basedir/step1_tracing/dark2.pal .
+  cp $basedir/step1_tracing/speedup.plot .
+  cp $basedir/step1_tracing/paraver_filter.cfg .
+  cp $basedir/tutorial_instructions . -R
+  ln -s ${MUSA_BENCHMARKS}/${APP} .
+  ln -s ${MUSA_BENCHMARKS}/${APP}_instr .
+  PADRANKS=$(printf "%0*d" 6 $NRANKS)
+  sed -e "s/APP=.*/APP=$APP/g" \
+      -e "s/RANKS=.*/RANKS=\"$PADRANKS\"/g" \
+      -e "s/CORELIST=.*/CORELIST=\"$CORELIST\"/g" < $basedir/step1_tracing/generate_speedup_graph.bash >generate_speedup_graph.bash
+  chmod 775 generate_speedup_graph.bash
+  sed -e "s/^APPNAME=.*/APPNAME=$APP/g" \
+      -e "s#^ARGS=.*#ARGS=\"$ARGS\"#g" \
+      -e "s/^#SBATCH --ntasks=4/#SBATCH --ntasks=$NRANKS/g" \
+      -e "s/^RANKS=.*/RANKS=$NRANKS/g" \
+      -e "s/^CORELIST=.*/CORELIST=\"1 2 4 8 16\"/g" \
+      < $basedir/step1_tracing/native_run.bash > native_run.bash
+  cp $basedir/step1_tracing/create_sim_environment.bash .
+  chmod 755 create_sim_environment.bash
+
+  if [[ $USER == nct01[0-9]* ]]; then
+    echo "Dectected tutorial user $USER , setting tha appropiate queue and reservation."
+    sed -i "s/-qos=debug/-qos=training\n#SBATCH --reservation=PATCARM18/g" native_run.bash
+    sed -i "s/-qos=debug/-qos=training\n#SBATCH --reservation=PATCARM18/g" job_tracer.bash
+    sed -i "s/-qos=debug/-qos=training\n#SBATCH --reservation=PATCARM18/g" job_tracer_memory.bash
+  fi
+}
+
+basedir=${MUSA_HOME}/tasksim/etc/examples
+
+if [ $# -eq 0 ]; then
+  copy_musa_start_files HPCG_Dibona_nosve "96 96 96" 4 "1 2 4 8 16 32"
+elif [ $# -eq 4 ]; then
+  copy_musa_start_files $1 $2 $3 $4
+else
+  echo "Wrong number of parameters for musa_start."
+  echo "Provide no parameters for BT-MZ.A.4 (default)."
+  echo "Otherwise:"
+  echo " $1 - Application name."
+  echo " $2 - Application arguments."
+  echo " $3 - Number of ranks."
+  echo " $4 - List of cores to simulate."
+fi

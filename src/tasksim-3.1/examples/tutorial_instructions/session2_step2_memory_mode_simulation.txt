@@ -1,0 +1,31 @@
+-------------------------------------------------------------------------------
+Session 2; Memory mode simulation
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+Step 2: Memory mode presimulations
+-------------------------------------------------------------------------------
+
+The mpi_phases simulations will be performed on:
+ + TRACE_sp-mz.A.4_000004_MEMO/SIMULATION/A1_PRESIM.
+
+To generate the list of commands that will launch TaskSim single rank
+simulations we execute:
+
+$> ./generate_musa_presim.bash
+
+This will generate a set of greasy files with the commands for the simulations
+and a set of launch_*.bash scripts to submit those jobs to MareNostrum's queue
+system. On larger benchmarks it is useful to submit the jobs separately, but
+in order to ease the process we can just execute:
+
+$> sbatch launch_all_simulations.bash
+
+This will submit all the presimulations in one job. It will take around 15 minutes.
+
+This job will simulate all traced mpi_phases for all ranks in burst mode
+(as we did before), and for the computation phases traced in memory mode all 
+the memory hierarchy (Caches, Bus, DRAM,...) will be simnulated.
+ + Those results are in TRACE_sp-mz.A.4_000004_MEMO/SIMULATION/A1_PRESIM/
+       musa_out_sp-mz.A.4_000008/
+           marenostrum_configuration_000008_BRST/marenostrum_configuration_000008_BRST.dat
+           marenostrum_configuration_000008_MEMO/marenostrum_configuration_000008_MEMO.dat

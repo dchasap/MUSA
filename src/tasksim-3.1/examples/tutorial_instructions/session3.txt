@@ -1,0 +1,139 @@
+-------------------------------------------------------------------------------
+Session 3; Different architecture comparison
+-------------------------------------------------------------------------------
+
+The focus of this session will be to simulate a benchmark (HPCCG) with
+different hardware configurations. The selected configurations are:
+ - MareNostrum 4: a configuration very similiar to the real
+                  MareNostrum 4 machine.
+ - ARM High end: a configuration of a would be high end ARM chip, with HBM
+                 memory.
+ - ARM low power: a configuration of a would be low power ARM chip, with
+                  DDR3 as memory technology.
+
+This ARM architectures are not based on a real machine, but are configurations
+of what could be build followind different objectives (pure performance vs
+energy efficiency).
+
+For this session the trace of the benchmark execution has already been
+generated. This trace will be from HPCCG, with a data set of size 104x104x104.
+
+To copy the relevant scripts:
+
+$> musa_third_session.bash
+
+This copies the scripts to generate the comparison plots at the end of the
+session, the configuration files that we will use to the different
+architectures and the scripts to generate the simulation environment.
+
+
+To copy the trace that we will use:
+
+$> musa_get_third_session_trace.bash
+
+This copies the trace on: TRACE_HPCCG_000016_MEMO/ but without any of the
+simulation scripts prepared. For that we need to execute:
+
+This is your last change to modify the configurations easily, afther this
+they are copied and modified for each of the threads_per_rank configurations
+and simulation modes.
+
+$> ./create_sim_environment.bash
+
+This script contains parameters similar to those of the previous sessions
+and creates the base scripts on TRACE_HPCCG_000016_MEMO/SIMULATION/A1_PRESIM/
+
+To start the simulation we can go.
+
+$> cd TRACE_HPCCG_000016_MEMO/SIMULATION/A1_PRESIM/
+
+As with the previous simulations we have to prepare the simulation commands
+to be executed with greasy:
+
+$> ./generate_musa_presim.bash
+
+This will have modified all the relevant bash scripts. With one notable
+exception, the bash script that governs the simulations has a default
+time limit of 20 minutes, which we will exceed, so we must change it:
+
+$> vim launch_all_musa_presims.bash
+
+The file should contain the following line:
+#SBATCH --time=2:00:00
+
+$> sbatch launch_all_musa_presims.bash
+
+If you look at the file containing the simulation commands, this time
+is significantly longer (30k simulations).
+During the simulations you can check the simulations progress
+
+$> tail -f greasy-${job_id}.log
+
+64 threads simulations can take a while (1h10m), 32 thread simulations should
+take a maximum of 30 minutes, so if you do not want to wait, you can 
+tun the following scripts that extrapolate and integrate the simulations before all the simulation ends.
+
+To check how many memopry-mode simulations have ended:
+
+$> wc -l musa_out_HPCCG_0000*/*MEMO/*.dat
+
+12 musa_out_HPCCG_000001/arm_high_end_000001_MEMO/arm_high_end_000001_MEMO.dat
+12 musa_out_HPCCG_000001/arm_low_power_000001_MEMO/arm_low_power_000001_MEMO.dat
+12 musa_out_HPCCG_000001/mn4_musa_000001_MEMO/mn4_musa_000001_MEMO.dat
+12 musa_out_HPCCG_000002/arm_high_end_000002_MEMO/arm_high_end_000002_MEMO.dat
+12 musa_out_HPCCG_000002/arm_low_power_000002_MEMO/arm_low_power_000002_MEMO.dat
+12 musa_out_HPCCG_000002/mn4_musa_000002_MEMO/mn4_musa_000002_MEMO.dat
+12 musa_out_HPCCG_000004/arm_high_end_000004_MEMO/arm_high_end_000004_MEMO.dat
+12 musa_out_HPCCG_000004/arm_low_power_000004_MEMO/arm_low_power_000004_MEMO.dat
+12 musa_out_HPCCG_000004/mn4_musa_000004_MEMO/mn4_musa_000004_MEMO.dat
+12 musa_out_HPCCG_000008/arm_high_end_000008_MEMO/arm_high_end_000008_MEMO.dat
+12 musa_out_HPCCG_000008/arm_low_power_000008_MEMO/arm_low_power_000008_MEMO.dat
+12 musa_out_HPCCG_000008/mn4_musa_000008_MEMO/mn4_musa_000008_MEMO.dat
+12 musa_out_HPCCG_000016/arm_high_end_000016_MEMO/arm_high_end_000016_MEMO.dat
+12 musa_out_HPCCG_000016/arm_low_power_000016_MEMO/arm_low_power_000016_MEMO.dat
+12 musa_out_HPCCG_000016/mn4_musa_000016_MEMO/mn4_musa_000016_MEMO.dat
+12 musa_out_HPCCG_000032/arm_high_end_000032_MEMO/arm_high_end_000032_MEMO.dat
+12 musa_out_HPCCG_000032/arm_low_power_000032_MEMO/arm_low_power_000032_MEMO.dat
+12 musa_out_HPCCG_000032/mn4_musa_000032_MEMO/mn4_musa_000032_MEMO.dat
+12 musa_out_HPCCG_000064/arm_high_end_000064_MEMO/arm_high_end_000064_MEMO.dat
+12 musa_out_HPCCG_000064/arm_low_power_000064_MEMO/arm_low_power_000064_MEMO.dat
+12 musa_out_HPCCG_000064/mn4_musa_000064_MEMO/mn4_musa_000064_MEMO.dat
+252 total
+
+This result would indicate that all 12 simulations in memory mode have finished with all configurations.
+
+To extrapolate memory-burst ratios:
+
+$> ./extrapolate_burst_duration_arm_high_end.bash
+$> ./extrapolate_burst_duration_arm_low_power.bash
+$> ./extrapolate_burst_duration_mn4_musa.bash
+
+And finally to integrate the simulation results into Paraver traces:
+
+$> cd ../A2_INTEGRATION_PRESIM/
+$> ./integrate_dimemas_simulations.bash
+
+Please note that this results are not 100% viable data. For this tutorial we have
+simplyfied the integration procedure, with some know bugs (the contention factor is
+applied to non parallel computational phases possibly distorting the comparison
+between different architectures).
+
+To observe the resulting traces:
+
+$> cd traces_SIMULATED
+$> module load paravewr
+$> paraver MUSA_HPCCG_000064cores_arm_high_end_presim.prv &
+
+
+And finally to generate a speed-up comparison graph:
+
+$> cd ../../../../
+$> ./generate_hpccg_comparison.bash
+
+Please note again, that the image generation script has hardcoded the duration
+of the initialization + finalization phases of the binary program, that is done
+in order to obtain somewhat reliable speedup results for the program region
+of interest, which is the numbers outputed on the native run.
+
+
+That is all for the third tutorial session.

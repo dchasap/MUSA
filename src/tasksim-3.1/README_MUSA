@@ -1,0 +1,477 @@
+README_MUSA
+===========
+  MUSA methodology combines different simulation tools to 
+recreate different scenearios of future supercomputing environments.
+
+  The installation process requires a proper configuration of the 
+tools:
+  - mercurium compiler
+  - nanos runtime     + musa_nanos_plugin
+  - tasksim simulator + musa_plugin     (multicore)
+  - dimemas simulator + musa_ts_plugin  (network)
+
+
+1 -- INSTALLATION
+=================
+  This infrastructure requires the installation of several
+tools with their own specific rules. It is recommended to 
+create separated directories for sources code, build 
+environment and installation folders.
+
+  The main installation process mainly follows the rules
+defined on the guidelines for the TaskSim installation process 
+with small differences, which are going to be highligthed in the 
+following example. 
+
+  A folder named MUSA is created containing
+the following subdirectories;
+  - 01_src    ; source code
+  - 02_build  ; build directory
+  - 03_install; final installation directory
+  - deps      ; external dependencies (Pin);
+  
+  Sources are placed in 01_src, and build and
+installation directories are created;
+  - mcxx      ; mercurium
+  - nanos     ; nanos runtime
+  - tasksim   ; tasksim + musa enhanced version
+  - dimemas   ; contained within the tasksim source folder
+                  requires its own build and installation 
+                  directories
+
+  a) Let's assume installation directory:
+      - INSDIR=/home/user/MUSA  
+  b) Already installed dependencies:
+      - MPI=/apps/OPENMPI/1.8.5/GCC 
+      - EXTRAE=/apps/CEPBATOOLS/extrae/deprecated/2.5.1/openmpi/64
+      - PAPI=/apps/CEPBATOOLS/deps/papi/5.3.0/
+  c) Specific Intel PIN is placed in:
+      - PIN=${INSDIR}/deps/soft/pin
+
+  1.1 -- BUILD AND INSTALL
+  ========================
+  * 01_src/tasksim: 
+      ./setup.sh
+  * 02_build/tasksim:
+    ${INSDIR}/01_src/tasksim/configure 
+        --prefix=${INSDIR}/03_install/tasksim 
+        --with-nanox-install-path=${INSDIR}/03_install/nanox 
+        --with-nanox-src-path=${INSDIR}/01_src/nanox 
+        --with-pin-path=${INSDIR}/deps/soft/pin 
+        --with-mpi-install-path=${MPI}
+        --with-extrae-install-path=${EXTRAE}
+        --with-papi-install-path=${PAPI}
+        --enable-paraver 
+        --enable-nanox 
+        --enable-ptlsim 
+        --enable-mpi 
+        traceformat=mem 
+  * 01_src/nanox:
+      autoreconf -fis
+  * 02_build/nanox:
+      ${INSDIR}/01_src/nanox/configure 
+        --prefix=${INSDIR}/03_install/nanox 
+        --with-nextsim=${INSDIR}/02_build/tasksim/ 
+        --with-extrae=${EXTRAE}
+        --with-papi-install-path=${PAPI}
+        --enable-papi 
+        --disable-allocator 
+        --disable-gpu-arch 
+        --disable-opencl-arch
+  * 02_build/nanos
+        make -j 4 && make install
+  * 02_build/tasksim
+        make -j 4 && make install
+  * 01_src/mcxx
+        autoreconf -fis
+  * 02_build/mcxx
+      ${INSDIR}/01_src/mcxx/configure 
+        --prefix=${INSDIR}/03_install/mcxx 
+        --with-nanox=${INSDIR}/03_install/nanox/
+        --enable-ompss 
+  * 02_build/mcxx
+        make -j 4 && make install
+  * 02_build/dimemas
+      ${INSDIR}/01_src/tasksim/ext/dimemas-5.2.12_musa/configure 
+        --prefix=${INSDIR}/03_install/dimemas
+  * 02_build/dimemas
+      make -j 4 && make install
+
+
+  1.2 -- CONFIGURATION
+  ====================
+  To ease the process of using MUSA a module is created containing 
+the paths of the selected directory.
+
+  If modules are not enabled, just activate your own directory of 
+modules by adding it to the MODULEPATH environment variable in your
+bashrc
+
+  ## own local module directory
+  export MODULEPATH=$MODULEPATH:~/.modules
+  ## musa module to be loaded
+  module load musa/release.1.1
+
+  Create and edit the module ~/.module/musa/release.1.1
+ --------------------- RELEASE.1.1 module ------------------------------
+ #%Module 
+ # CAA HPC user environment
+ # Author                : callande@bsc.es
+ # Created               : February 4 2016
+ # Last modification by  : callande@bsc.es
+ # March 28, 2014
+ # Last modification     :
+ #### dependencies
+ ##      openmpi/1.8.5
+ ##      gcc/4.7.2
+ #### version
+ module-whatis "BSC_MUSA v.1.1"
+ #### instalation paths
+ set          devel            /home/user/MUSA
+ append-path  LD_LIBRARY_PATH  /apps/CEPBATOOLS/deps/papi/5.3.0/lib
+ #### release 
+ prepend-path PATH             ${devel}/03_install/dimemas/bin
+ setenv       DIMEMAS_HOME     ${devel}/03_install/dimemas
+ prepend-path PATH             ${devel}/03_install/mcxx/bin
+ prepend-path PATH             ${devel}/03_install/nanox/bin
+ prepend-path PATH             ${devel}/03_install/tasksim/bin
+ prepend-path LD_LIBRARY_PATH  ${devel}/03_install/tasksim/lib
+ setenv       TS_PHASE_WRAPPER ${devel}/03_install/tasksim/lib/libtsmpi.so
+ setenv       TS_PINTOOL_PATH  ${devel}/03_install/tasksim/lib/libompss-trace.so
+ setenv       TS_PIN_PATH      ${devel}/deps/soft/pin/pin.sh
+ ----------------------------------------------------------------------
+
+
+2 -- TRACE GENERATION
+=====================
+  An example of trace generation script can be found on the folder 
+name examples/step1_tracing.
+ 
+  To meet the requirements for tracing an hybrid application it is 
+required to provide two binaries complied with mercurium. One version 
+linked against the nanos performance library (called ${BIN}), and 
+a second version linked against the instrumented nanos 
+library (called "${BIN}_instr" ).
+
+  Compiling an hybrid application using mercurium as compiler, requires
+to specify the runtime MPI library at compilation and linkage time. As
+an example, the following commands;
+  ----------------------------------------------------------------------
+  ### Performance version
+  mcc -c --ompss              -I${MPI_PATH}/include       -o code.o     code.c
+  mcc                         -L${MPI_PATH}/lib     -lmpi -o code       code.o
+  ### Instrumented version
+  mcc -c --ompss --instrument -I${MPI_PATH}/include       -o code.o     code.c
+  mcc                         -L${MPI_PATH}/lib     -lmpi -o code_instr code.o
+  ----------------------------------------------------------------------
+
+  The example script contains 3 sections:
+  ----------------------------------------------------------------------
+  MANDATORY;
+    * PR ;  number of MPI ranks 
+    * APP;  application name (performance binary name)
+    * ARGS; application arguments (if required)
+  ----------------------------------------------------------------------
+  TUNING;
+    * EXTRAE_CONFIG_FILE and EXTRAE_HOME; to select a specific extrae version
+    * PARALLEL_INSTRUMENTATION; MUSA requires two performance traces. The 
+        extrae/paraver trace with communication patterns and cpu execution 
+        bursts, and a tasksim trace with nanos runtime events (tasks) and 
+        execution bursts.
+          The double registration of execution bursts increases the overhead on 
+        the outter most tracing tool (extrae). 
+          To avoid this overhead it is possible to execute the applation twice, 
+        to obtain performance metrics from two different exections. This is done
+        by dissabling this environmental variable (set to 0). 
+          When an evaluation requires a comparison of speedups with the baseline
+        of the default Dimemas simulation (with no TaskSim integration), it 
+        is recommended to disable parallel instrumentation.
+    * MEMORY_MODE; TaskSim is capable of simulating the execution of tasks and 
+        reconstruct the tasks execution for a specified number of cores. This is
+        based on reconstructing the execution of burst per tasks or by 
+        simulating the concurrency on the memory hierarchy. For the second, it 
+        is required to obtain the memory instructions from the sequential 
+        execution.
+          Obtaining the memory trace is expensive in terms of execution time and
+        disk space. Another execution of the application is required to obtain 
+        the memory trace. At the end, the memory trace is merged against the 
+        performance trace. 
+          IMPORTANT!!! (job schedulers); When enabling the memory mode, it is 
+        required to increase the number of ranks by one for the job to be 
+        scheduled. The tracing tools works as a Master-Worker application and 
+        the main process is responsible of executing and synchronizing the 
+        workers.
+    * MEMORY MODE FILTERING
+          MEM_PHASES_{INIT,NUM}; start tracing in memory mode for the ompss 
+        phase starting at INIT and continue to obtain NUM phases.
+          RANK_{INIT,NUM}; trace in memory mode for the rank starting from 
+        INIT and continue for the next NUM ranks.  
+    * MASTER_ALIAS; tasks and master phases share same address space within the 
+        tasksim trace. Increase the offset defined by MASTER_ALIAS to avoid
+        collision of tasks and master phases.
+          If a collision of tasks and virtual master phases is produced, 
+        it will be reported by the error execution log. Re-run the application
+        increasing this value.
+          The general rule says that master alias has to be greater than the 
+        maximum number of tasks on the rank to be memory traced. 
+  ----------------------------------------------------------------------
+  COMMAND LINE;
+    launch_musa.bash $PR $APP $ARGS
+  ----------------------------------------------------------------------
+
+
+3 -- MULTILEVEL SIMULATION (MLS)
+================================
+
+  MUSA is the methodology to integrade Dimemas performing network level 
+simulation and TaskSim for multicore simulation. Both are trace driven
+simulators. 
+  The current methodology works by runing an enhanced version of Dimemas
+which identifies execution burst, and when a burst is identifies as a 
+nanos burst, the execution time is being replaced by the simulation 
+time obtained from TaskSim assuming a target multicore architecture.
+  It provides two simulation modes, online replacement, which instantiates
+a TaskSim process, and presimulation mode, which obtains the precalculated
+execution time from a data file.
+  The folling sections present the presimulation and online simulation
+modes whithin MUSA.
+
+  3.1 -- PRESIMULATION MODE
+  =========================
+    This mode is capable of presimulate in parallel all the OmpSs phases 
+  whithin a trace. After the exectuion, at least, a file is provided 
+  containing every phase, rank and exectuion time provided by TaskSim for
+  a given configuration file.
+    It is possible to obtain a paraver trace for every simulation and
+  the hardware counter for the memory simulation to analyze performance 
+  metrics related to the memory model.
+    This mode comprehends to stages, the presimulation phase and the 
+  final integration of presimulation results within the Dimemas simluation.  
+    
+
+  3.1.1 -- PRESIMULATION EXECUTION
+  ================================  
+    Because all simulations are independant, all the simulations can be
+  performed in parallel. To do so, it is provided an MPI tool to obtain 
+  the final presimulation results file.
+    It has been implemented as a Master-Work application, and therefore,
+  a minimum of 2 process have to be defined and one process is going 
+  to be in charge of schedule work among workers and in charge of writing
+  the results.
+    The ideal number of processes for a paralle job would be 
+  (RANKS*OMPSS_PHASES)+1.
+
+    The example script defines some environmental variables to control the
+  behaviour of the presimulation tool:
+
+    ----------------------------------------------------------------------
+    MANDATORY
+      NP;     Number of parallel workers.
+      TRACE;  Folder containing the TaskSim trace
+      CONF;   TaskSim configuration file. 
+                The following fields are replaced by the presimulation tool:
+          - ncpus;            Number of cores
+          - mode_selector;    Burst/Memory
+          - trace_base_name;  If paraver is enabled
+    ----------------------------------------------------------------------
+    TUNING;
+    * SIM_CORES; Parametriced number of cores in the TaskSim simulation. 
+        It rreplaces the number of cores on the TaskSim confing file.
+    * SIM_MEM; Enables memory mode simulation on phases trace in memory mode.
+          Simulation time in memory mode is significantly increased. 
+    * SIM_PRV; Enables generation of paraver traces.
+          It is adviced to disable paraver traces for medium/big simulations.
+          Trace generation on phases can generate a big overhead in disk 
+          space and simulation time. 
+    * SIM_LOG; Keep temporary simulation files for every simulated phases.
+          If the number of simulations to perform is in the number of thousands,
+          it is advided to disable logs in order to reduce the overload on the 
+          filesystem. 
+    ---------------------------------------------------------------------
+    COMMAND LINE; 
+      launch_musa_presim.bash $NP $TRACE $CONF
+    ----------------------------------------------------------------------
+
+  3.1.2 -- PRESIMULATION INTEGRATION
+  ==================================
+    Once the presimulation has ended, the partial results simulated for a 
+  target architecture can be integrated in Dimemas, which automatically is
+  going to identify the insertion points (nanos phases).
+
+    Even if partial paraver traces have been generated along the presimulation,
+  the user can specify wheter or not integrating paraver subtraces per 
+  TaskSim phase. This is done by enabling;
+  * TS_SIM_PRV      ; deprecated; set to 1 to integrate partial paraver trace.
+  * TS_SIM_MEM      ; deprecated
+  * TS_RANGE_INI;   ; deprecated
+  * TS_RANGE_FIN;   ; deprecated
+  * TS_MEM_INI;     ; deprecated
+  * TS_MEM_FIN;     ; deprecated
+
+    Dimemas command line aggregates 4+1 arguments to allow the integration of 
+  TaskSim presimulated results as follows:
+  * tasksim   $MODE ; {presim|online}; set presim for presimulation.
+  * ts_trace_folder ; folder containing all the TaskSim traces per rank.
+  * ts_trace_name   ; binary name.
+  * ts_presim_file  ; file with partial results generated at presimulation time.
+  * ts_prv          ; OPTIONAL; folder with presimulated paraver traces
+
+
+  ----------------------------------------------------------------------
+  COMMAND LINE EXAMPLE
+  --------------------
+  MODE=presim
+  TRACE=trace
+  APP=bt-mz.A.4.200.iter
+  PRESIM=presim_results_1cores_mem.dat
+  TMP=trace_01th_burst
+
+  Dimemas   -tasksim         $MODE   \
+            -ts_trace_folder $TRACE  \
+            -ts_trace_name   $APP    \
+            -ts_presim_file  $PRESIM \
+            -ts_prv          $TMP    \
+            \
+            -S               32K     \
+            -pa              trace_SIMULATED/MUSA_${APP}_${PRESIM}_${MODE}.prv \
+            config_NET.cfg
+  ----------------------------------------------------------------------
+
+
+  3.2 -- ONLINE INTEGRATION
+  =========================
+ 
+    It is also possible to run Dimemas combined with TaskSim with no previous 
+  presimulation. This option is only recommended for small tests and 
+  prefereably on burst_only mode. In this mode, all the TaskSim simulations are 
+  performed sequentially. 
+  
+    Dimemas starts the simulation and, when a nanos phase is reached, the 
+  replacement is performed after an instation of TaskSim returns the simulation 
+  time.
+    
+    The environmental setup is ideantical as the presimulaton integration mode 
+  but defining mode as 'online' and instead of defining the presimulation 
+  results file, the TaskSim config file.
+    
+    To control the TaskSim simulations mode, define the following environmental
+  variables:
+  * TS_SIM_MEM; burst_only or memory modes (0 and 1 respectively)
+  * TS_SIM_PRV; generate paraver traces
+  * TS_RANGE_INI;   ; deprecated
+  * TS_RANGE_FIN;   ; deprecated
+  * TS_MEM_INI;     ; deprecated
+  * TS_MEM_FIN;     ; deprecated
+
+  ----------------------------------------------------------------------
+  COMMAND LINE EXAMPLE
+  --------------------
+  MODE=online
+  TRACE=trace
+  APP=bt-mz.A.4.200.iter
+  CONFIG=tasksim.conf
+  TMP=trace_01th_burst
+
+  mkdir $TMP
+  export TS_SIM_MEM=0
+  export TS_SIM_PRV=0
+
+  Dimemas   -tasksim         $MODE   \
+            -ts_trace_folder $TRACE  \
+            -ts_trace_name   $APP    \
+            -ts_config       $CONFIG \
+            -ts_prv          $TMP    \
+            \
+            -S               32K     \
+            -pa              trace_SIMULATED/MUSA_${APP}_${PRESIM}_${MODE}.prv \
+            config_NET.cfg
+  ----------------------------------------------------------------------
+
+
+
+
+4 -- PREPARATION OF EXPERIMENTAL ENVIRONMENT (using templates)
+==============================================================
+
+  In this section, it is going to exemplify how to cretae an experimental 
+environment by using some scripts developed with the aim of simplify the 
+process.
+
+  4.1. -- Preparation of the enviroment
+  =====================================
+    Considering all the tools and dependencies are fulfilled the only 
+  requirement is to have two versions of the hybrid (MPI+OmpSs) applcation. The 
+  first, compiled using the performance nanos runtime library, and the second 
+  using the nanos instrumentation runtime library and using the same binary 
+  name plus "_instr" at the end.
+    First step is to perform one of the following:
+
+  A)  cp ${TASKSIM_SRC}/step1_tracing/job_tracer.bash .
+    or
+  B)  musa_get_trace.bash
+
+
+    Doing so, a templated script to be modified by the user will be copied 
+  into the current directory containing the binaries.
+
+    Following this, the user needs to modify the script in terms of:
+
+  4.1.1)  Job scheduler (if required); the current template is defined for 
+        IBM lsf jobs scheduler at Marenostrum Supercomputer. 
+        
+        *) JOB EXECUTION TIME; consider increasing the window execution time of
+          your job depending assuming Base time as the native execution    
+          time of the application and the tracing level:
+            - Base time; burst mode and parallel instrumentation.
+            - Double base time (default); burst mode and no parallel 
+              instrumentation.
+            - 100x slowdown; memory mode with no filtering.
+
+        *) NUMBER OF RANKS; if memory mode is enabled, increase the job's number
+          of ranks by one. This is going to allow the musa memory tracer, in 
+          a master process, to instantiate a subspace of workers recreationg 
+          the effective MPI context.
+        
+
+  4.1.2)  Binary parameters; Define the application specific parameters for the
+        application which will be propragated along the different 
+        tools in the following terms:
+        - PR; number of number of ranks 
+        - APP; binary name (performance version).
+        - ARGS; if required by application.
+          
+  4.1.3)  Tracing parameters; Tracing parameters as defined in the section 2.
+
+  4.1.4)  Folder of the experiment context; a variable can be defined to 
+        contain the experimental environment, considering generated traces,
+        scripts, and simulation results. 
+           Defining a string for the environmental variable MUSA_EXP_NAME  
+   
+
+  4.2 -- TRACE GENERATION AND SIMULATION
+  ======================================
+
+    Execute or submit the previous defined script and wait for the finalization.
+  This job is responsible of generating the trace and, based on the execution 
+  parameters, to create a templated simulation environment.
+  
+    At the conclusion, assuming a succesfull execution, a  folder with the 
+  $MUSA_EXP_NAME  will be generated containing among others, the following 
+  subfolders:
+    * LOGS; Log files with redirected outputs of the different steps
+      of the MUSA trace generation pipeline.  
+    * TRACE; Generated traces for TaskSim and Dimemas.
+    * SIMULATION; Ready to be simulated (templated) environment adapted for the 
+        current application parameters. Trace folders are linked and 
+        Dimemas configuration file is adapted to the current application 
+        number of ranks. The generated folders are:
+      - A1_PRESIM; Presimulation enviroment as defined in Section 3.1.1
+      - A2_INTEGRATION_PRESIM; Presimulaton integration as defined in 
+          Section 3.1.2
+      - B1_INTEGRATION_ONLINE; Online integration as defined in Section 3.2
+  
+
+
+
+
+ 

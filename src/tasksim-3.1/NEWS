@@ -1,0 +1,19 @@
+CycleSim Simulation Infrastructure
+Barcelona Supercomputing Center
+Universitat Politecnica de Catalunya
+---------------------------------------------------------------------------
+
+
+Version 0.1
+===========
+
+Release date: STILL UNDER DEVELOPMENT; NOT RELEASED YET
+Status:       Experimental
+
+Changes:
+
+* Reimplementation of TaskSim
+
+
+---------------------------------------------------------------------------
+End of document

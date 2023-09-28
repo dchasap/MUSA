@@ -1,0 +1,10 @@
+
+## To access the module, just add this line to your .bashrc or .profile bash 
+## configuration file at home folder.
+
+
+
+export MODULEPATH=$MODULEPATH:/gpfs/projects/bsc18/romol/MUSA/01_src/tasksim/scripts/module
+
+
+
