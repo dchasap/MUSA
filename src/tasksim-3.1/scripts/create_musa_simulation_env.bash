@@ -31,7 +31,7 @@ mkdir -p $INT_PRESIM/trace_SIMULATED
 
 # ====================== STEP TWO FILES =======================================
 
-STEP_TWO_SOURCE=$MUSA_HOME/tasksim/examples/step2_presim
+STEP_TWO_SOURCE=$MUSA_HOME/tasksim/etc/examples/step2_presim
 
 sed -e "s/APP/$APP/g" -e "s/MODE/${MEMORY_MODE}/g"< ${MUSA_HOME}/tasksim/bin/generate_musa_presim.bash > $MUSA_EXP_NAME/SIMULATION/A1_PRESIM/generate_musa_presim.bash
 chmod 755 $MUSA_EXP_NAME/SIMULATION/A1_PRESIM/generate_musa_presim.bash

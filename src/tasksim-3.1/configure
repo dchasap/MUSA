@@ -659,12 +659,12 @@ ENABLE_MPI_FALSE
 ENABLE_MPI_TRUE
 ENABLE_TIME_STATS_FALSE
 ENABLE_TIME_STATS_TRUE
-ENABLE_MITOS_FALSE
-ENABLE_MITOS_TRUE
 ENABLE_PARAVER_FALSE
 ENABLE_PARAVER_TRUE
 ENABLE_COMPULSORY_MISS_FALSE
 ENABLE_COMPULSORY_MISS_TRUE
+ENABLE_PROFET_FALSE
+ENABLE_PROFET_TRUE
 ramulator_lib_path
 ramulator_src_path
 ENABLE_RAMULATOR_FALSE
@@ -847,9 +847,9 @@ with_dramsim_install_path
 enable_ramulator
 with_ramulator_src_path
 with_ramulator_lib_path
+enable_profet
 enable_compulsory_miss_analysis
 enable_paraver
-enable_mitos
 enable_timestats
 enable_mpi
 with_mpi_install_path
@@ -1512,10 +1512,10 @@ Optional Features:
   --enable-nanox          Enable NANOS++ integration (default = no)
   --enable-dramsim        Enable DRAMSIMv2 integration (default = no)
   --enable-ramulator      Enable RAMULATOR integration (default = no)
+  --enable-profet         Enable PROFET integration (default = no)
   --enable-compulsory-miss-analysis
                           Enable Paraver trace generation (default = no)
   --enable-paraver        Enable Paraver trace generation (default = no)
-  --enable-mitos          Enable Mitos trace generation (default = no)
   --enable-timestats      Enable Runtime statistics (default = no)
   --enable-mpi            Enable MPI support for hybrid applications (default
                           = no)
@@ -16114,9 +16114,10 @@ else
   as_fn_error -1 "\"ramulator-lib-path not specified\"" "$LINENO" 5
 fi
 
-else
-  global_cxxflags="$global_cxxflags -Werror"
 fi
+#	else
+#  global_cxxflags="$global_cxxflags -Werror"
+#fi
  if test "x$enable_ramulator" = "xyes"; then
   ENABLE_RAMULATOR_TRUE=
   ENABLE_RAMULATOR_FALSE='#'
@@ -16134,6 +16135,31 @@ if test x"$enable_ramulator" = x"yes"; then
 
 	$as_echo "#define RAMULATOR 1" >>confdefs.h
 
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether PROFET integration is enabled" >&5
+$as_echo_n "checking whether PROFET integration is enabled... " >&6; }
+# Check whether --enable-profet was given.
+if test "${enable_profet+set}" = set; then :
+  enableval=$enable_profet; enable_profet="$enableval"
+else
+  enable_profet=no
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_profet" >&5
+$as_echo "$enable_profet" >&6; }
+ if test "x$enable_profet" = "xyes"; then
+  ENABLE_PROFET_TRUE=
+  ENABLE_PROFET_FALSE='#'
+else
+  ENABLE_PROFET_TRUE='#'
+  ENABLE_PROFET_FALSE=
+fi
+
+if test x"$enable_profet" = x"yes"; then
+	$as_echo "#define ENABLE_PROFET 1" >>confdefs.h
+
+#	AC_DEFINE(PROFET)
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking Whether to enable Compulsory/Non-Compulsory miss analysis." >&5
@@ -16182,30 +16208,6 @@ fi
 
 if test x"$enable_paraver" = x"yes"; then
 	$as_echo "#define ENABLE_PARAVER 1" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether Mitos trace generation is enabled" >&5
-$as_echo_n "checking whether Mitos trace generation is enabled... " >&6; }
-# Check whether --enable-mitos was given.
-if test "${enable_mitos+set}" = set; then :
-  enableval=$enable_mitos; enable_mitos="$enableval"
-else
-  enable_mitos=no
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_mitos" >&5
-$as_echo "$enable_mitos" >&6; }
- if test "x$enable_mitos" = "xyes"; then
-  ENABLE_MITOS_TRUE=
-  ENABLE_MITOS_FALSE='#'
-else
-  ENABLE_MITOS_TRUE='#'
-  ENABLE_MITOS_FALSE=
-fi
-
-if test x"$enable_mitos" = x"yes"; then
-	$as_echo "#define ENABLE_MITOS 1" >>confdefs.h
 
 fi
 
@@ -16781,16 +16783,16 @@ if test -z "${ENABLE_RAMULATOR_TRUE}" && test -z "${ENABLE_RAMULATOR_FALSE}"; th
   as_fn_error $? "conditional \"ENABLE_RAMULATOR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${ENABLE_PROFET_TRUE}" && test -z "${ENABLE_PROFET_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_PROFET\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${ENABLE_COMPULSORY_MISS_TRUE}" && test -z "${ENABLE_COMPULSORY_MISS_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_COMPULSORY_MISS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_PARAVER_TRUE}" && test -z "${ENABLE_PARAVER_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_PARAVER\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ENABLE_MITOS_TRUE}" && test -z "${ENABLE_MITOS_FALSE}"; then
-  as_fn_error $? "conditional \"ENABLE_MITOS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_TIME_STATS_TRUE}" && test -z "${ENABLE_TIME_STATS_FALSE}"; then

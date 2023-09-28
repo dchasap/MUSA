@@ -1342,37 +1342,8 @@ struct TransOp: public TransOpBase {
   }
 
   void init(int opcode, int rd, int ra, int rb, int rc, int size, W64s rbimm = 0, W64s rcimm = 0, W32 setflags = 0, int memid = 0)  {
-		//Dimitrios fix for class-memaccess non-trivial object
-    //setzero(*this);
-		this->extshift = 0;
-		this->unaligned = 0;
-		this->cond = 0;
-		this->nouserflags = 0;
-  
-		this->internal = 0;
-		this->locked = 0; 
-		this->cachelevel = 0; 
-		this->datatype = 0;
-
-		this->bytes = 0;
-		this->som = 0;
-		this->eom = 0;
-		this->is_sse = 0;
-		this->is_x87 = 0;
-
-		this->bbindex = 0;
-
-		this->final_insn_in_bb = 0;
-		this->final_arch_in_insn = 0;
-		this->final_flags_in_insn = 0;
-		this->any_flags_in_insn = 0; 
-		this->pad = 0;
-		this->marked = 0;
-
-		this->riptaken = 0;
-		this->ripseq = 0;
-		// end fix
-		this->opcode = opcode;
+    setzero(*this);
+    this->opcode = opcode;
     this->rd = rd; 
     this->ra = ra;
     this->rb = rb;

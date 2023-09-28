@@ -53,7 +53,7 @@ public:
 class IDMA {
 public:
     virtual ~IDMA() {};
-    virtual void memcpy(const engine::addr_t &, const engine::addr_t &, const std::size_t &, uint64_t ip) = 0;
+    virtual void memcpy(const engine::addr_t &, const engine::addr_t &, const std::size_t &) = 0;
 };
 
 class MMU {
@@ -156,8 +156,8 @@ public:
     void register_dram_size(std::size_t);
 
     void load_access_profile();
-    void notify_clear_complete(unsigned, engine::addr_t &, uint64_t ip);
-    void notify_migration_complete(engine::addr_t &, engine::addr_t &, std::size_t &, uint64_t ip);
+    void notify_clear_complete(unsigned, engine::addr_t &);
+    void notify_migration_complete(engine::addr_t &, engine::addr_t &, std::size_t &);
 };
 
 

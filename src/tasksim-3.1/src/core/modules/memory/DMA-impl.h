@@ -114,10 +114,9 @@ void DMA<Message, Interconnect>::end()
             if (it != memcpy_request_source_map_.end()) {
                 read_acks_received_++;
                 memcpy_request_t memcpy_request = *(it->second);
-								//FIXME:
                 output_buffer_.push_back(typename Message::Request(Message::Request::op_t::WRITE,
                         memcpy_request.destination_addr + (ack_req.get_tag() - memcpy_request.source_addr),
-                        0, line_size_, 42, 42));
+                        0, line_size_));
             }
         }
 
@@ -137,8 +136,7 @@ void DMA<Message, Interconnect>::end()
                     // Migration completed. Notify MMU
                     mmu_.notify_migration_complete(memcpy_request.source_addr,
                                                    memcpy_request.destination_addr,
-                                                   memcpy_request.memcpy_request_size,
-																									 24);
+                                                   memcpy_request.memcpy_request_size);
                 }
             }
         }
@@ -192,7 +190,7 @@ template<typename Message, template<typename> class Interconnect>
 inline
 void DMA<Message, Interconnect>::memcpy(const engine::addr_t &source_addr,
                                         const engine::addr_t &destination_addr,
-                                        const std::size_t &size, uint64_t ip)
+                                        const std::size_t &size)
 {
     Log::debug2() << this->get_simulator().get_clock() << ":memcpy_start:" << source_addr
                   << ":" << destination_addr << ":" << size;
@@ -209,8 +207,7 @@ void DMA<Message, Interconnect>::memcpy(const engine::addr_t &source_addr,
         this->set_module_activity(engine::NEXT);
     }
     for (engine::addr_t addr = source_addr; addr < source_addr + size; addr += line_size_) {
-				//FIXME:
-        output_buffer_.push_back(typename Message::Request(Message::Request::op_t::READ, addr, line_size_, 0, ip));
+        output_buffer_.push_back(typename Message::Request(Message::Request::op_t::READ, addr, line_size_));
     }
 }
 

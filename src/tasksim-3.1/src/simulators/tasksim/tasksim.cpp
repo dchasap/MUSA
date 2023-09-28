@@ -41,6 +41,7 @@
 #include "core/modules/memory/DMA.h"
 #include "core/modules/memory/DRAM.h"
 #include "core/modules/memory/Perfect.h"
+#include "core/modules/memory/PROFET.h"
 #include "core/utils/CheckTrace.h"
 #include "simulators/tasksim/runtime/OmpSs.h"
 #include "simulators/tasksim/runtime/ModeSelector.h"
@@ -51,6 +52,9 @@
 
 #elif ENABLE_RAMULATOR  // ENABLE_RAMULATOR
 #include "core/modules/memory/RamulatorController.h"
+
+#elif ENABLE_PROFET
+#include "core/modules/memory/PROFET.h"
 #endif
 
 typedef struct {
@@ -63,7 +67,6 @@ sim::engine::Config parse_options(int, char*[], Options&);
 
 int main(int argc, char *argv[])
 {
-
     sim::stats::Time_Stats.phaseIn(sim::engine::REGION_SIMULATOR_SETUP);
     Options opt;
     sim::engine::Config conf = parse_options(argc, argv, opt);
@@ -150,7 +153,12 @@ int main(int argc, char *argv[])
                 *memory = new sim::memory::RamulatorController<sim::logic::coherence::single::Message,
                 sim::interconnect::Direct>(simulator, sim::engine::Config(conf, "RAMULATOR"),
                         sim::engine::Config(conf, "DL1Cache"), tcpus, &mmu);
-    #elif 1
+		#elif ENABLE_PROFET
+        sim::memory::PROFET<sim::logic::coherence::single::Message,
+                sim::interconnect::Direct>
+                *memory = new sim::memory::PROFET<sim::logic::coherence::single::Message,
+                sim::interconnect::Direct>(simulator, sim::engine::Config(conf, "PROFET"));
+		#elif 1
         sim::memory::Perfect<sim::logic::coherence::single::Message,
                 sim::interconnect::Direct>
                 *memory = new sim::memory::Perfect<sim::logic::coherence::single::Message,
@@ -269,6 +277,8 @@ void version(const std::string& cmd)
     std::cout << "DRAM uses Dramsim2 integration" << std::endl;
 #elif ENABLE_RAMULATOR
     std::cout << "DRAM uses Ramulator integration" << std::endl;
+#elif ENABLE_PROFET
+		std::cout << "DRAM uses PROFET integration" << std::endl;
 #elif 1
     std::cout << "DRAM uses \"Perfect\" module" << std::endl;
 #else
@@ -286,13 +296,6 @@ void version(const std::string& cmd)
 #else
     std::cout << "Without Paraver trace generation." << std::endl;
 #endif
-
-#if ENABLE_MITOS
-    std::cout << "With Mitos trace generation." << std::endl;
-#else
-    std::cout << "Without Mitos trace generation." << std::endl;
-#endif
-
 
 #ifdef SIMLOG_LEVEL
     std::cout << "Compiled with System logging infrastructure at level " << SIMLOG_LEVEL << std::endl;

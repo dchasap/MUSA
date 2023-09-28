@@ -125,10 +125,7 @@ void SimpleMemory<T>::issue_instruction()
     }
 
     assert(mem_op != T::Request::op_t::LAST);
-		//next_instruction_.st
-    pending_queue_.push(typename T::Request(mem_op, mem_addr, mem_size, 
-																						static_cast<uint8_t>(next_instruction_.type_), 
-																						next_instruction_.pc_));
+    pending_queue_.push(typename T::Request(mem_op, mem_addr, mem_size));
 }
 
 

@@ -162,15 +162,30 @@ if test x"$enable_ramulator" = x"yes"; then
 	AS_HELP_STRING([--with-ramulator-lib-path], [Sets the path to libramulator.a from Ramulator]),
         ramulator_lib_path="$withval",
         AC_MSG_ERROR("ramulator-lib-path not specified",-1))
-else
-  global_cxxflags="$global_cxxflags -Werror"
 fi
+#	else
+#  global_cxxflags="$global_cxxflags -Werror"
+#fi
 AM_CONDITIONAL([ENABLE_RAMULATOR], [test "x$enable_ramulator" = "xyes"])
 AC_SUBST(ramulator_src_path, ["$ramulator_src_path"])
 AC_SUBST(ramulator_lib_path, ["$ramulator_lib_path"])
 if test x"$enable_ramulator" = x"yes"; then
 	AC_DEFINE(ENABLE_RAMULATOR)
 	AC_DEFINE(RAMULATOR)
+fi
+
+dnl Check for PROFET support
+AC_MSG_CHECKING([whether PROFET integration is enabled])
+AC_ARG_ENABLE([profet],
+    [AS_HELP_STRING([--enable-profet],
+        [Enable PROFET integration (default = no)])],
+    [enable_profet="$enableval"],
+    [enable_profet=no])
+AC_MSG_RESULT([$enable_profet])
+AM_CONDITIONAL([ENABLE_PROFET], [test "x$enable_profet" = "xyes"])
+if test x"$enable_profet" = x"yes"; then
+	AC_DEFINE(ENABLE_PROFET)
+#	AC_DEFINE(PROFET)
 fi
 
 dnl Check whether to enable Compulsory/Non-Compulsory miss analysis.
@@ -198,19 +213,6 @@ AC_MSG_RESULT([$enable_paraver])
 AM_CONDITIONAL([ENABLE_PARAVER], [test "x$enable_paraver" = "xyes"])
 if test x"$enable_paraver" = x"yes"; then
 	AC_DEFINE(ENABLE_PARAVER)
-fi
-
-dnl Check whether to create Mitos trace
-AC_MSG_CHECKING([whether Mitos trace generation is enabled])
-AC_ARG_ENABLE([mitos],
-    [AS_HELP_STRING([--enable-mitos],
-        [Enable Mitos trace generation (default = no)])],
-    [enable_mitos="$enableval"],
-    [enable_mitos=no])
-AC_MSG_RESULT([$enable_mitos])
-AM_CONDITIONAL([ENABLE_MITOS], [test "x$enable_mitos" = "xyes"])
-if test x"$enable_mitos" = x"yes"; then
-	AC_DEFINE(ENABLE_MITOS)
 fi
 
 dnl Check whether to generate time usage statistics

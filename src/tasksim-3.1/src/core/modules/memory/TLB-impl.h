@@ -145,7 +145,7 @@ void TLB<Message, Interconnect>::end()
             i->second.acks_pending_--;
             if (i->second.acks_pending_ == 0) {
                 page_clear_map_.erase(i);
-                mmu_.notify_clear_complete(cpu_id_, physical_page, 24);
+                mmu_.notify_clear_complete(cpu_id_, physical_page);
                 clears_completed_++;
             }
         } else {
@@ -221,9 +221,7 @@ void TLB<Message, Interconnect>::send_clear_request(engine::addr_t &physical_pag
             typename Message::Request(
                     Message::Request::op_t::CLEAR,
                     physical_page,
-                    page_size_,
-										0,
-										0));
+                    page_size_));
 
     page_clear_map_.insert(
             std::pair<engine::addr_t, page_clear_item_t>(
@@ -243,7 +241,7 @@ void TLB<Message, Interconnect>::send_translated_request(typename Message::Reque
     else
         page_stat_map_.insert(std::pair<engine::addr_t, page_stat_item_t>(physical_page, page_stat_item_t(1, false)));
 
-    output_request_buffer_.emplace_back(typename Message::Request(req.get_op(), physical_addr, req.get_size(), req.get_op_name(), req.get_ip()));
+    output_request_buffer_.emplace_back(typename Message::Request(req.get_op(), physical_addr, req.get_size()));
 }
 
 template<typename Message, template<typename> class Interconnect>

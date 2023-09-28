@@ -95,13 +95,6 @@ void Instrumentation<TraceType>::add_function_name(const char* name)
 }
 
 template <typename TraceType>
-void Instrumentation<TraceType>::add_precise_memory_event(const InstrumentationItem &trace_item)
-{
-    static_cast<TraceType*>(this)->add_precise_memory_event(trace_item);
-}
-
-
-template <typename TraceType>
 sim::engine::cycles_t Instrumentation<TraceType>::get_hardware_sampling_interval()
 {
     return static_cast<TraceType*>(this)->get_hardware_sampling_interval();

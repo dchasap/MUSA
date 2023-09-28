@@ -329,26 +329,6 @@ void RamulatorController<Message, Interconnect>::return_request(ramulator::Reque
     stats_.latency += latency,
     stats_.count++;
 
-#ifdef ENABLE_MITOS
-		std::cout << "[Mitos] Registering memory access." << std::endl;
-		sim::utils::instrumentation::SelectedInstrumentation& instrumentation =
-          this->get_simulator().get_instrumentation();
-//    unsigned instrumentation_id = (overwrite_cpu_id != 0) ? overwrite_cpu_id : this->instrumentation_id_;
-    instrumentation.add_precise_memory_event(
-            utils::instrumentation::InstrumentationItem {
-            sent_requests.front().data_.get_cpu_id(), 
-            0,
-            this->get_simulator().get_clock(),
-            utils::instrumentation::EVENT_RECORD,
-            utils::instrumentation::PreciseMemoryEvent {0, // op 
-																												0, // ip	
-																												sent_requests.front().data_.get_tag(), 
-																												latency, 
-																												4, // level
-																												(uint64_t)sent_requests.front().data_.get_op()}});
-#endif
-
-
     // send Ack(initial Request) back
     output_buffer_.push_back(typename Message::Ack(sent_requests.front().data_));
 

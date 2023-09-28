@@ -40,8 +40,8 @@ mitem_t::mitem_t() :
 {}
 
 inline
-mitem_t::mitem_t(addr_t pc, addr_t addr, addr_t data, uint8_t op, uint8_t flags, uint16_t size, uint8_t nins):
-    pc_(pc), addr_(addr), data_(data), op_(op), flags_(flags), size_(size), ins_(nins)
+mitem_t::mitem_t(addr_t addr, addr_t data, uint8_t op, uint8_t flags, uint16_t size, uint8_t nins):
+    addr_(addr), data_(data), op_(op), flags_(flags), size_(size), ins_(nins)
 {}
 
 inline

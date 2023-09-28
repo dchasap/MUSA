@@ -128,12 +128,14 @@ static void execute_dr(int argc, char * const argv[], const char *tmp_file_name,
     const char *o_flag = "-o";
     const char *dash_flag = "--";
     const char *dr_path = getenv("DR_PATH");
+		std::cout << "DR_PATH:" << dr_path << std::endl;
     if (dr_path == NULL) {
         std::cerr << "[OMPSS ERROR] Cannot find DynamoRIO path, please set DR_PATH" << std::endl;
         return;
     }
 
     const char *tool_path = getenv("DRTOOL_PATH");
+		std::cout << "DRTOOL_PATH:" << tool_path << std::endl;
     if (tool_path == NULL) {
         std::cerr << "[OMPSS ERROR] Cannot find drtool path, please set DRTOOL_PATH" << std::endl;
         return;
@@ -153,6 +155,7 @@ static void execute_dr(int argc, char * const argv[], const char *tmp_file_name,
             nx_args_string += nx_args;
         }
         nx_args_string += " --disable-ut --smp-workers=1 --throttle-upper=9999999";
+				std::cout << "NX_ARGS:" << nx_args_string << std::endl;
         setenv("NX_ARGS", nx_args_string.c_str(), 1);
 
         /* optional extra args */
@@ -171,6 +174,13 @@ static void execute_dr(int argc, char * const argv[], const char *tmp_file_name,
         /* DynamoRIO Executable */
         alloc_and_copy(argv_dr, nparams++, dr_path);
 
+				std::cout << "[OMPSS]:";
+        for (int i = 0; i < nparams; i++) {
+            std::cout << " " << argv_dr[i];
+        }
+        std::cout << std::endl;
+
+
         /* DR_ARGS */
         std::istringstream dr_args_oss(dr_args_string);
         std::string aux;
@@ -180,14 +190,34 @@ static void execute_dr(int argc, char * const argv[], const char *tmp_file_name,
         /* DynamoRIO Tool */
         alloc_and_copy(argv_dr, nparams++, c_flag);
         alloc_and_copy(argv_dr, nparams++, tool_path);
+				std::cout << "[OMPSS]:";
+        for (int i = 0; i < nparams; i++) {
+            std::cout << " " << argv_dr[i];
+        }
+        std::cout << std::endl;
+
+
         /* OmpSs trace */
         alloc_and_copy(argv_dr, nparams++, i_flag);
         alloc_and_copy(argv_dr, nparams++, tmp_file_name);
+				std::cout << "[OMPSS]:";
+        for (int i = 0; i < nparams; i++) {
+            std::cout << " " << argv_dr[i];
+        }
+        std::cout << std::endl;
+
+
         /* TS trace */
         alloc_and_copy(argv_dr, nparams++, o_flag);
         alloc_and_copy(argv_dr, nparams++, out_file_name);
 
         alloc_and_copy(argv_dr, nparams++, dash_flag);
+				std::cout << "[OMPSS]:";
+        for (int i = 0; i < nparams; i++) {
+            std::cout << " " << argv_dr[i];
+        }
+        std::cout << std::endl;
+
 
         /* Application and parameters */
         for (int i = 0; i < argc; i++) {
@@ -200,7 +230,7 @@ static void execute_dr(int argc, char * const argv[], const char *tmp_file_name,
             std::cout << " " << argv_dr[i];
         }
         std::cout << std::endl;
-
+				std::cout << "argv_dr[0]:" << argv_dr[0] << std::endl;
         execv(argv_dr[0], argv_dr);
         std::cerr << "[OMPSS ERROR] Unable to execute: ";
         for (int i = 0; i < nparams; i++) {

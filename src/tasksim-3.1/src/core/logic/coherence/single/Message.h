@@ -88,24 +88,18 @@ std::ostream &operator<<(std::ostream &os, const Packet &p);
 
 struct Request : virtual public Packet {
 private:
-		uint32_t op_name_;
-		uint64_t ip_;
     req_op_t op_;
     bool fill_;
 public:
     typedef req_op_t op_t;
     Request();
-    Request(op_t, const tag_t &addr, size_t size, 
-				uint32_t op_name, uint64_t ip,
-				size_t data_size = 0, size_t data = 0,
+    Request(op_t, const tag_t &addr, size_t size, size_t data_size = 0, size_t data = 0,
         const task_dep_t &dep_type = task_dep_t::NON_IN_OUT, size_t task_type = 0,
         uint16_t cpu_id = 0, uint64_t user_code_id = 0, bool fill = false);
     Request(const Request &original);
     /** Creates a Request for a Cache Line. */
     Request(const Request &original, op_t op, size_t cache_line_size);
     op_t get_op() const;
-		uint32_t get_op_name() const;
-		uint64_t get_ip() const;
     bool operator==(const Request &b) const;
     bool is_fill() const;
     void set_fill(bool fill);

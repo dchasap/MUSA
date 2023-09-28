@@ -25,8 +25,8 @@
  */
 
 
-#ifndef CORE_MODULES_MEMORY_PERFECT_H_
-#define CORE_MODULES_MEMORY_PERFECT_H_
+#ifndef CORE_MODULES_MEMORY_PROFET_H_
+#define CORE_MODULES_MEMORY_PROFET_H_
 
 #include <list>
 #include <deque>
@@ -113,6 +113,35 @@ private:
     bool blocked_;
     /** Indicates the last cycles where there were no blocked Requests. */
     sim::engine::cycles_t last_nonblocked_cycle_;
+
+    /** PROFET variables **/
+    double leadOffLatency, maxBandwidth, maxLatency;
+		double MaxTheoreticalBW;
+		double lastEstimatedBandwidth;
+		double lastEstimatedLatency;
+
+    		// factor of latency over max latency when the bandwidth is maxed out.
+		const double overflowFactor = 1.2;
+		// fisrt dimention: read percentafe
+		// second dimention data for each read percentage
+		// second dimention has two value 
+		// [0]: bandwidth (accesses/cycles) 
+		// [1]: latency (cycles)
+		std::vector<std::vector<std::vector<double>>> curves_data;
+		std::vector<double> maxBandwidthPerRdRatio;
+		std::vector<uint32_t> maxLatencyPerRdRatio;
+
+    uint32_t currentWindowAccessCount;
+		uint32_t currentWindowAccessCount_wr;
+		uint32_t currentWindowAccessCount_rd;
+		
+    uint32_t curveWindowSize;
+		sim::engine::cycles_t currentWindowStartCycle;
+
+    /** PROFET functions calls **/
+    void updateLatency(sim::engine::cycles_t currentWindowEndCyclen);
+    sim::engine::cycles_t searchForLatencyOnCurve(double bandwidth, double readPercentage);
+
 };
 
 }  // namespace memory

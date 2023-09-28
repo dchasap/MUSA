@@ -40,9 +40,7 @@ namespace single {
 inline
 Packet::Packet() :
     tag_(0), size_(0), data_size_(0)
-{
-	//std::cout << "Packet.defaut.create" << std::endl;
-}
+{}
 
 inline
 Packet::Packet(const engine::addr_t &tag,
@@ -56,9 +54,7 @@ Packet::Packet(const engine::addr_t &tag,
     task_type_(task_type),
     cpu_id_(cpu_id),
     user_code_id_(user_code_id)
-{
-	//std::cout << "Packet.create" << std::endl;
-}
+{}
 
 inline
 Packet::Packet(const Packet &original) :
@@ -70,9 +66,7 @@ Packet::Packet(const Packet &original) :
         task_type_(original.task_type_),
         cpu_id_(original.cpu_id_),
         user_code_id_(original.user_code_id_)
-{
-	//std::cout << "Packet.copy" << std::endl;
-}
+{}
 
 inline
 Packet::Packet(const Packet &original, size_t cache_line_size) :
@@ -84,9 +78,7 @@ Packet::Packet(const Packet &original, size_t cache_line_size) :
         task_type_(original.task_type_),
         cpu_id_(original.cpu_id_),
         user_code_id_(original.user_code_id_)
-{
-	//std::cout << "Packet.copy2" << std::endl;
-}
+{}
 
 inline
 Packet::tag_t Packet::get_tag() const
@@ -175,57 +167,33 @@ void Packet::touch(const Packet &packet)
 
 inline
 Request::Request() : op_(req_op_t::LAST), fill_(false)
-{
-	//std::cout << "create0 request with ip " << std::hex << 12 << std::dec << std::endl;
-	this->ip_ = 12;
-}
+{}
 
 inline
-Request::Request(op_t op, const engine::addr_t &addr, size_t size, uint32_t op_name, uint64_t ip, 
-				size_t data_size, size_t data,
+Request::Request(op_t op, const engine::addr_t &addr,
+        size_t size, size_t data_size, size_t data,
         const task_dep_t &dep_type, size_t task_type, uint16_t cpu_id, uint64_t user_code_id, bool fill) :
-    Packet(addr, size, data_size, data, dep_type, task_type, cpu_id, user_code_id), 
-					op_name_(op_name), ip_(ip), op_(op), fill_(fill)
-{
-	//std::cout << "create1 request with ip " << std::hex << ip << std::dec << std::endl;
-}
+    Packet(addr, size, data_size, data, dep_type, task_type, cpu_id, user_code_id), op_(op), fill_(fill)
+{}
 
 inline
 Request::Request(const Request &original, op_t op, size_t cache_line_size) :
         Packet(original, cache_line_size),
-				op_name_(original.op_name_),
-				ip_(original.ip_),
-				op_(op)
+        op_(op)
 {
-	//std::cout << "create2 request with ip " << std::hex << original.ip_ << std::dec << std::endl;
 }
 
 inline
 Request::Request(const Request &original) :
         Packet(original),
-				op_name_(original.op_name_),
-				ip_(original.ip_),
         op_(original.op_)
 {
-	//std::cout << "create3 request with ip " << std::hex << original.ip_ << std::dec << std::endl;
 }
 
 inline
 Request::op_t Request::get_op() const
 {
     return op_;
-}
-
-inline
-uint32_t Request::get_op_name() const
-{
-    return op_name_;
-}
-
-inline
-uint64_t Request::get_ip() const
-{
-    return ip_;
 }
 
 inline bool Request::operator==(const Request &b) const {

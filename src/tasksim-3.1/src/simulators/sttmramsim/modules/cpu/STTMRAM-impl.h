@@ -104,12 +104,11 @@ void STTMRAM<T,R>::fetch_mem_request()
 
     if (mem_request.op_ == trace::sttmram::mem_t::op_t::READ)
     {
-				//FIXME: 
-        pending_request_ = new typename T::Request(T::Request::op_t::READ, mem_request.addr_, 8, 69, 69);
+        pending_request_ = new typename T::Request(T::Request::op_t::READ, mem_request.addr_, 8);
     }
     else
     {
-        pending_request_ = new typename T::Request(T::Request::op_t::WRITE, mem_request.addr_, 8, 69, 69);
+        pending_request_ = new typename T::Request(T::Request::op_t::WRITE, mem_request.addr_, 8);
     }
 
     send_cycle_ = this->get_simulator().get_clock() + ceil(mem_request.instruction_count_ * cpi_ + mem_request.cache_hit_count_ * cache_hit_latency_) + 1;

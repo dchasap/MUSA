@@ -200,7 +200,7 @@ ROB<Output>::issue_read_requests(elem_t &elem)
         // First we calculate the request size
         unsigned req_size = std::min(size, max_request_size_ - (addr % max_request_size_));
         sim::logic::coherence::single::Request request(sim::logic::coherence::single::Request::op_t::READ,
-                addr, req_size, 0, elem.item_.pc_, 0, elem.item_.data_);
+                addr, req_size, 0, elem.item_.data_);
         Log::debug() << "ROB::issue_read_requests: Adding a read request for address "
                      << std::hex << addr << std::dec << " and size " << req_size;
         out_.push(request);
@@ -222,7 +222,7 @@ ROB<Output>::issue_write_requests(elem_t &elem)
         // First we calculate the request size
         unsigned req_size = std::min(size, max_request_size_ - (addr % max_request_size_));
         logic::coherence::single::Request request(logic::coherence::single::Request::op_t::WRITE,
-                addr, 0, 0, elem.item_.pc_, req_size, elem.item_.data_);
+                addr, 0, req_size, elem.item_.data_);
         Log::debug() << "ROB::issue_write_requests: Adding a write request for address "
                      << std::hex << addr << std::dec << " and size " << size;
         out_.push(request);
