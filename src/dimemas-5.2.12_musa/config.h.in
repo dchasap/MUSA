@@ -153,15 +153,11 @@
 /* Paraver 'logical recv' events will we located when MPI_wait is called */
 #undef LOGICAL_RECEIVE_ALS_WAIT
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
 /* "Dimemas won't show compilation information" */
 #undef NO_COMPILATION_INFO
-
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-#undef NO_MINUS_C_MINUS_O
 
 /* Name of package */
 #undef PACKAGE

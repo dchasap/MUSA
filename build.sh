@@ -1,21 +1,14 @@
 
 # dependency libraries and root paths
 
-export PAPI_PATH=/apps/PAPI/5.6.0
-#export MPI=/apps/OPENMPI/4.1.0/GCC
-#export MPI_PATH=/apps/INTEL/2017.4/impi/2017.3.196
-#export MPI_PATH=/apps/OPENMPI/1.10.7/GCC/7.1.0
-export MPI_PATH=/apps/OPENMPI/4.0.1/GCC
-#export EXTRAE=/apps/BSCTOOLS/extrae/4.0.1/openmpi_4_0_1
-#export EXTRAE_PATH=/apps/BSCTOOLS/extrae/4.0.1/impi_2017_4
-export EXTRAE_PATH=/apps/BSCTOOLS/extrae/4.0.1/openmpi_4_0_1
-#export DRAMSIM_PATH=/home/bsc18/bsc18186/scratch/openmpi-1.4.1
-#export PIN=/apps/PIN/3.15-98253-gb56e429b1-gcc-linux
-export DYNAMORIO_PATH=/gpfs/scratch/bsc18/bsc18292/romol/DR/dynamorio/build
-export RAMULATOR_PATH=/gpfs/scratch/bsc18/bsc18292/romol/ramulator/ramulator
+export PAPI_PATH=/p/project/deep/stages/2023/software/PAPI/7.0.0-GCCcore-11.3.0
+export MPI_PATH=/p/software/deep/stages/2023/software/OpenMPI/4.1.4-GCC-11.3.0
+export EXTRAE_PATH=/p/project/deepsea/wp2/easybuild/2023/easybuild/deep/software/Extrae/4.0.1_musa-GCC-11.3.0
+export DYNAMORIO_PATH=/p/project/deepsea/wp2/easybuild/2023/easybuild/deep/software/DynamoRIO/9.0.1-GCC-11.3.0
+export RAMULATOR_PATH=/p/project/deepsea/wp2/easybuild/2023/easybuild/deep/software/Ramulator/0.0-GCC-11.3.0
 
 # Directories
-export ROOT_DIR=/home/bsc18/bsc18186/scratch/musa.3.1
+export ROOT_DIR=/p/project/deepsea/chasapis2/MUSA
 export SRC_DIR=${ROOT_DIR}/src
 export BUILD_DIR=${ROOT_DIR}/build
 export INSTALL_DIR=${ROOT_DIR}/install

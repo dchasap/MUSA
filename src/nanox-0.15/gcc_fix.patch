@@ -1,0 +1,59 @@
+diff --git a/src/core/wddeque.hpp b/src/core/wddeque.hpp
+index 96a1aa18..d0a5221b 100644
+--- a/src/core/wddeque.hpp
++++ b/src/core/wddeque.hpp
+@@ -36,7 +36,8 @@ inline WDDeque::WDDeque( bool enableDeviceCounter ) : _dq(), _lock(), _nelems(0)
+    if ( _deviceCounter ) {
+       const DeviceList &devs = sys.getSupportedDevices();
+       for ( DeviceList::const_iterator it = devs.begin(); it != devs.end(); ++it ) {
+-         _ndevs.insert( std::make_pair<const Device*, Atomic<unsigned int> >( *it, 0 ) );
++			   auto dev = *it;
++         _ndevs.insert( std::make_pair<const Device* &, Atomic<unsigned int> >( dev, 0 ) );
+       }
+    }
+ }
+@@ -546,7 +547,8 @@ inline WDPriorityQueue<T>::WDPriorityQueue( bool enableDeviceCounter, bool optim
+    if ( _deviceCounter ) {
+       const DeviceList &devs = sys.getSupportedDevices();
+       for ( DeviceList::const_iterator it = devs.begin(); it != devs.end(); ++it ) {
+-         _ndevs.insert( std::make_pair<const Device*, Atomic<unsigned int> >( *it, 0 ) );
++			   auto dev = *it;	
++         _ndevs.insert( std::make_pair<const Device* &, Atomic<unsigned int> >( dev, 0 ) );
+       }
+    }
+ }
+diff --git a/src/plugins/instrumentation/nextsim.cpp b/src/plugins/instrumentation/nextsim.cpp
+index f0f04a1f..8125f8be 100644
+--- a/src/plugins/instrumentation/nextsim.cpp
++++ b/src/plugins/instrumentation/nextsim.cpp
+@@ -49,7 +49,7 @@ namespace nanos {
+ #define WD_ID(__index__) (__index__)
+ 
+ #if defined(NDEBUG)
+-#define verify(expr) expr
++#define verify(expr) ;;
+ #else
+ #define verify(expr) assert(expr)
+ #endif
+@@ -170,7 +170,7 @@ public:
+         // assert(wd.active_ == true and wd.phase_stack_.empty() == false);
+ 
+         if (instr_entry_time >= wd.phase_st_time_ + lost_time_) {
+-            uint64_t time = instr_entry_time - wd.phase_st_time_ - lost_time_;
++            //uint64_t time = instr_entry_time - wd.phase_st_time_ - lost_time_;
+             verify(trace_writer_->add_event(sim::trace::ompss::event_t(wd.wd_id_, sim::trace::ompss::PHASE_EVENT, wd.phase_stack_.top(), time)) == true);
+         }
+         lost_time_ = 0;
+diff --git a/src/plugins/instrumentation/tdg.cpp b/src/plugins/instrumentation/tdg.cpp
+index 279c81c1..ee190468 100644
+--- a/src/plugins/instrumentation/tdg.cpp
++++ b/src/plugins/instrumentation/tdg.cpp
+@@ -604,7 +604,7 @@ public:
+         InstrumentationDictionary *iD = getInstrumentationDictionary();
+         static const nanos_event_key_t create_wd_ptr = iD->getEventKey("create-wd-ptr");
+         static const nanos_event_key_t dependence = iD->getEventKey("dependence");
+-        static const nanos_event_key_t dep_direction = iD->getEventKey("dep-direction");
++        //static const nanos_event_key_t dep_direction = iD->getEventKey("dep-direction");
+         static const nanos_event_key_t user_funct_location = iD->getEventKey("user-funct-location");
+         static const nanos_event_key_t taskwait = iD->getEventKey("taskwait");
+         static const nanos_event_key_t critical_wd_id = iD->getEventKey("critical-wd-id");

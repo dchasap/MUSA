@@ -1,0 +1,200 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Indicates the presence of the Cluster arch plugin. */
+#undef CLUSTER_DEV
+
+/* Disables warnings when using functions deprecated in OpenCL 2.0 */
+#undef CL_USE_DEPRECATED_OPENCL_2_0_APIS
+
+/* Enables DLB support. */
+#undef DLB
+
+/* Enables FPGA support */
+#undef FPGA_DEV
+
+/* Defines which multithreading support is required to GASNet */
+#undef GASNET_PAR
+
+/* Indicates the presence of the GPU arch plugin. */
+#undef GPU_DEV
+
+/* Define to 1 if you have the <CL/opencl.h> header file. */
+#undef HAVE_CL_OPENCL_H
+
+/* Define to 1 if you have the <dlb.h> header file. */
+#undef HAVE_DLB_H
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <gasnet.h> header file. */
+#undef HAVE_GASNET_H
+
+/* Define to 1 if you have the <hwloc.h> header file. */
+#undef HAVE_HWLOC_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <libxdma.h> header file. */
+#undef HAVE_LIBXDMA_H
+
+/* Define to 1 if you have the <memkind.h> header file. */
+#undef HAVE_MEMKIND_H
+
+/* Define to 1 if you have the <mpi.h> header file. */
+#undef HAVE_MPI_H
+
+/* Defined if the compiler supports the new gcc atomic builtins */
+#undef HAVE_NEW_GCC_ATOMIC_OPS
+
+/* Define to 1 if you have the <OpenCL/opencl.h> header file. */
+#undef HAVE_OPENCL_OPENCL_H
+
+/* Define if you have POSIX threads libraries and header files. */
+#undef HAVE_PTHREAD
+
+/* Have PTHREAD_PRIO_INHERIT. */
+#undef HAVE_PTHREAD_PRIO_INHERIT
+
+/* Define to 1 if you have the <spi/include/kernel/location.h> header file. */
+#undef HAVE_SPI_INCLUDE_KERNEL_LOCATION_H
+
+/* Define to 1 if you have the <spi/include/kernel/process.h> header file. */
+#undef HAVE_SPI_INCLUDE_KERNEL_PROCESS_H
+
+/* Define to 1 if you have the <sqlite3.h> header file. */
+#undef HAVE_SQLITE3_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if the compiler provides the __sync_add_and_fetch function for
+   uint64 */
+#undef HAVE_SYNC_ADD_AND_FETCH_8
+
+/* Define to 1 if the compiler provides the __sync_and_and_fetch function for
+   uint64 */
+#undef HAVE_SYNC_AND_AND_FETCH_8
+
+/* Define to 1 if the compiler provides the __sync_bool_compare_and_swap
+   function for uint64 */
+#undef HAVE_SYNC_BOOL_COMPARE_AND_SWAP_8
+
+/* Define to 1 if the compiler provides the __sync_or_and_fetch function for
+   uint64 */
+#undef HAVE_SYNC_OR_AND_FETCH_8
+
+/* Define to 1 if the compiler provides the __sync_sub_and_fetch function for
+   uint64 */
+#undef HAVE_SYNC_SUB_AND_FETCH_8
+
+/* Define to 1 if the compiler provides the __sync_xor_and_fetch function for
+   uint64 */
+#undef HAVE_SYNC_XOR_AND_FETCH_8
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Indicates the presence of hwloc library. */
+#undef HWLOC
+
+/* BlueGene/Q host compatibility is enabled. */
+#undef IS_BGQ_MACHINE
+
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
+#undef LT_OBJDIR
+
+/* Enables memkind support */
+#undef MEMKIND_SUPPORT
+
+/* Ignore cxx seek errors when including mpi.h in C++ */
+#undef MPICH_IGNORE_CXX_SEEK
+
+/* Identifies which MPI implementation is being used. Supported values: intel,
+   mpich, openmpi */
+#undef MPI_IMPLEMENTATION
+
+/* API version of the CUDA package specified by the user */
+#undef NANOS_CUDA_VERSION
+
+/* Version of the hwloc package specified by the user */
+#undef NANOS_HWLOC_VERSION
+
+/* Specifies whether Nanos++ memtracker module has been enabled */
+#undef NANOS_MEMTRACKER_ENABLED
+
+/* Indicates whether resiliency features should be used or not. */
+#undef NANOS_RESILIENCY_ENABLED
+
+/* Specifies whether Nanos++ allocator has been enabled */
+#undef NANOS_USE_ALLOCATOR
+
+/* Build version */
+#undef NANOX_BUILD_VERSION
+
+/* Enables task callback feature */
+#undef NANOX_TASK_CALLBACK
+
+/* Indicates the presence of the OpenCL arch plugin. */
+#undef OpenCL_DEV
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to necessary symbol if this constant uses a non-standard name on
+   your system. */
+#undef PTHREAD_CREATE_JOINABLE
+
+/* The size of `size_t', as computed by sizeof. */
+#undef SIZEOF_SIZE_T
+
+/* Indicates support for user level threads */
+#undef SMP_SUPPORTS_ULT
+
+/* Define to 1 if all of the C90 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
+#undef STDC_HEADERS
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
